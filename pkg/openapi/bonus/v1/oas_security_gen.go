@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/go-faster/errors"
-
 	"github.com/ogen-go/ogen/ogenerrors"
 )
 
@@ -35,11 +34,11 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 }
 
 var operationRolesJwtCookieAuth = map[string][]string{
-	BalanceWithdrawalOperation:   []string{},
-	GetOrdersNumberListOperation: []string{},
-	GetUserBalanceOperation:      []string{},
-	GetWithdrawalsOperation:      []string{},
-	OrderNumberLoadOperation:     []string{},
+	BalanceWithdrawalOperation:   {},
+	GetOrdersNumberListOperation: {},
+	GetUserBalanceOperation:      {},
+	GetWithdrawalsOperation:      {},
+	OrderNumberLoadOperation:     {},
 }
 
 func (s *Server) securityJwtCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {
