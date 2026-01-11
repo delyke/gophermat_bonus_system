@@ -15,7 +15,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -27,6 +27,10 @@ type codeRecorder struct {
 func (c *codeRecorder) WriteHeader(status int) {
 	c.status = status
 	c.ResponseWriter.WriteHeader(status)
+}
+
+func (c *codeRecorder) Unwrap() http.ResponseWriter {
+	return c.ResponseWriter
 }
 
 // handleBalanceWithdrawalRequest handles BalanceWithdrawal operation.
@@ -85,7 +89,7 @@ func (s *Server) handleBalanceWithdrawalRequest(args [0]string, argsEscaped bool
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -147,7 +151,9 @@ func (s *Server) handleBalanceWithdrawalRequest(args [0]string, argsEscaped bool
 			return
 		}
 	}
-	request, close, err := s.decodeBalanceWithdrawalRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeBalanceWithdrawalRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -171,6 +177,7 @@ func (s *Server) handleBalanceWithdrawalRequest(args [0]string, argsEscaped bool
 			OperationSummary: "Запрос на списание средств",
 			OperationID:      "BalanceWithdrawal",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -267,7 +274,7 @@ func (s *Server) handleGetOrdersNumberListRequest(args [0]string, argsEscaped bo
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -330,6 +337,8 @@ func (s *Server) handleGetOrdersNumberListRequest(args [0]string, argsEscaped bo
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetOrdersNumberListRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -338,6 +347,7 @@ func (s *Server) handleGetOrdersNumberListRequest(args [0]string, argsEscaped bo
 			OperationSummary: "Получение списка загруженных номеров заказов",
 			OperationID:      "GetOrdersNumberList",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -434,7 +444,7 @@ func (s *Server) handleGetUserBalanceRequest(args [0]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -497,6 +507,8 @@ func (s *Server) handleGetUserBalanceRequest(args [0]string, argsEscaped bool, w
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetUserBalanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -505,6 +517,7 @@ func (s *Server) handleGetUserBalanceRequest(args [0]string, argsEscaped bool, w
 			OperationSummary: "Получение текущего баланса пользователя",
 			OperationID:      "GetUserBalance",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -601,7 +614,7 @@ func (s *Server) handleGetWithdrawalsRequest(args [0]string, argsEscaped bool, w
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -664,6 +677,8 @@ func (s *Server) handleGetWithdrawalsRequest(args [0]string, argsEscaped bool, w
 		}
 	}
 
+	var rawBody []byte
+
 	var response GetWithdrawalsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
@@ -672,6 +687,7 @@ func (s *Server) handleGetWithdrawalsRequest(args [0]string, argsEscaped bool, w
 			OperationSummary: "Получение информации о выводе средств",
 			OperationID:      "GetWithdrawals",
 			Body:             nil,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -768,7 +784,7 @@ func (s *Server) handleLoginUserRequest(args [0]string, argsEscaped bool, w http
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -786,7 +802,9 @@ func (s *Server) handleLoginUserRequest(args [0]string, argsEscaped bool, w http
 			ID:   "LoginUser",
 		}
 	)
-	request, close, err := s.decodeLoginUserRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeLoginUserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -810,6 +828,7 @@ func (s *Server) handleLoginUserRequest(args [0]string, argsEscaped bool, w http
 			OperationSummary: "Аутентификация пользователя",
 			OperationID:      "LoginUser",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -906,7 +925,7 @@ func (s *Server) handleOrderNumberLoadRequest(args [0]string, argsEscaped bool, 
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -968,7 +987,9 @@ func (s *Server) handleOrderNumberLoadRequest(args [0]string, argsEscaped bool, 
 			return
 		}
 	}
-	request, close, err := s.decodeOrderNumberLoadRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeOrderNumberLoadRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -992,6 +1013,7 @@ func (s *Server) handleOrderNumberLoadRequest(args [0]string, argsEscaped bool, 
 			OperationSummary: "Загрузка номера заказа",
 			OperationID:      "OrderNumberLoad",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
@@ -1088,7 +1110,7 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
 			// max redirects exceeded), in which case status MUST be set to Error.
 			code := statusWriter.status
-			if code >= 100 && code < 500 {
+			if code < 100 || code >= 500 {
 				span.SetStatus(codes.Error, stage)
 			}
 
@@ -1106,7 +1128,9 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			ID:   "RegisterUser",
 		}
 	)
-	request, close, err := s.decodeRegisterUserRequest(r)
+
+	var rawBody []byte
+	request, rawBody, close, err := s.decodeRegisterUserRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -1130,6 +1154,7 @@ func (s *Server) handleRegisterUserRequest(args [0]string, argsEscaped bool, w h
 			OperationSummary: "Регистрация пользователя",
 			OperationID:      "RegisterUser",
 			Body:             request,
+			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}

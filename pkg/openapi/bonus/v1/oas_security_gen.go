@@ -34,11 +34,11 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 }
 
 var operationRolesJwtCookieAuth = map[string][]string{
-	BalanceWithdrawalOperation:   {},
-	GetOrdersNumberListOperation: {},
-	GetUserBalanceOperation:      {},
-	GetWithdrawalsOperation:      {},
-	OrderNumberLoadOperation:     {},
+	BalanceWithdrawalOperation:   []string{},
+	GetOrdersNumberListOperation: []string{},
+	GetUserBalanceOperation:      []string{},
+	GetWithdrawalsOperation:      []string{},
+	OrderNumberLoadOperation:     []string{},
 }
 
 func (s *Server) securityJwtCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) (context.Context, bool, error) {

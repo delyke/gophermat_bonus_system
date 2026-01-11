@@ -98,6 +98,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 						return
 					}
+
 				}
 
 			case 'l': // Prefix: "login"
@@ -183,6 +184,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 			}
+
 		}
 	}
 	s.notFound(w, r)
@@ -190,12 +192,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Route is route object.
 type Route struct {
-	name        string
-	summary     string
-	operationID string
-	pathPattern string
-	count       int
-	args        [0]string
+	name           string
+	summary        string
+	operationID    string
+	operationGroup string
+	pathPattern    string
+	count          int
+	args           [0]string
 }
 
 // Name returns ogen operation name.
@@ -213,6 +216,11 @@ func (r Route) Summary() string {
 // OperationID returns OpenAPI operationId.
 func (r Route) OperationID() string {
 	return r.operationID
+}
+
+// OperationGroup returns the x-ogen-operation-group value.
+func (r Route) OperationGroup() string {
+	return r.operationGroup
 }
 
 // PathPattern returns OpenAPI path.
@@ -289,6 +297,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = GetUserBalanceOperation
 						r.summary = "Получение текущего баланса пользователя"
 						r.operationID = "GetUserBalance"
+						r.operationGroup = ""
 						r.pathPattern = "/api/user/balance"
 						r.args = args
 						r.count = 0
@@ -313,6 +322,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.name = BalanceWithdrawalOperation
 							r.summary = "Запрос на списание средств"
 							r.operationID = "BalanceWithdrawal"
+							r.operationGroup = ""
 							r.pathPattern = "/api/user/balance/withdraw"
 							r.args = args
 							r.count = 0
@@ -321,6 +331,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							return
 						}
 					}
+
 				}
 
 			case 'l': // Prefix: "login"
@@ -338,6 +349,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = LoginUserOperation
 						r.summary = "Аутентификация пользователя"
 						r.operationID = "LoginUser"
+						r.operationGroup = ""
 						r.pathPattern = "/api/user/login"
 						r.args = args
 						r.count = 0
@@ -362,6 +374,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = GetOrdersNumberListOperation
 						r.summary = "Получение списка загруженных номеров заказов"
 						r.operationID = "GetOrdersNumberList"
+						r.operationGroup = ""
 						r.pathPattern = "/api/user/orders"
 						r.args = args
 						r.count = 0
@@ -370,6 +383,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = OrderNumberLoadOperation
 						r.summary = "Загрузка номера заказа"
 						r.operationID = "OrderNumberLoad"
+						r.operationGroup = ""
 						r.pathPattern = "/api/user/orders"
 						r.args = args
 						r.count = 0
@@ -394,6 +408,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = RegisterUserOperation
 						r.summary = "Регистрация пользователя"
 						r.operationID = "RegisterUser"
+						r.operationGroup = ""
 						r.pathPattern = "/api/user/register"
 						r.args = args
 						r.count = 0
@@ -418,6 +433,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.name = GetWithdrawalsOperation
 						r.summary = "Получение информации о выводе средств"
 						r.operationID = "GetWithdrawals"
+						r.operationGroup = ""
 						r.pathPattern = "/api/user/withdrawals"
 						r.args = args
 						r.count = 0
@@ -428,6 +444,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 
 			}
+
 		}
 	}
 	return r, false

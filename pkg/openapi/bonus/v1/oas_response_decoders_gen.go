@@ -33,7 +33,7 @@ func decodeBalanceWithdrawalResponse(resp *http.Response) (res BalanceWithdrawal
 		// Code 500.
 		return &BalanceWithdrawalInternalServerError{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
 func decodeGetOrdersNumberListResponse(resp *http.Response) (res GetOrdersNumberListRes, _ error) {
@@ -92,7 +92,7 @@ func decodeGetOrdersNumberListResponse(resp *http.Response) (res GetOrdersNumber
 		// Code 500.
 		return &GetOrdersNumberListInternalServerError{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
 func decodeGetUserBalanceResponse(resp *http.Response) (res GetUserBalanceRes, _ error) {
@@ -148,7 +148,7 @@ func decodeGetUserBalanceResponse(resp *http.Response) (res GetUserBalanceRes, _
 		// Code 500.
 		return &GetUserBalanceInternalServerError{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
 func decodeGetWithdrawalsResponse(resp *http.Response) (res GetWithdrawalsRes, _ error) {
@@ -207,7 +207,7 @@ func decodeGetWithdrawalsResponse(resp *http.Response) (res GetWithdrawalsRes, _
 		// Code 500.
 		return &GetWithdrawalsInternalServerError{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
 func decodeLoginUserResponse(resp *http.Response) (res LoginUserRes, _ error) {
@@ -264,7 +264,7 @@ func decodeLoginUserResponse(resp *http.Response) (res LoginUserRes, _ error) {
 		// Code 500.
 		return &LoginUserInternalServerError{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
 func decodeOrderNumberLoadResponse(resp *http.Response) (res OrderNumberLoadRes, _ error) {
@@ -291,7 +291,7 @@ func decodeOrderNumberLoadResponse(resp *http.Response) (res OrderNumberLoadRes,
 		// Code 500.
 		return &OrderNumberLoadInternalServerError{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
 func decodeRegisterUserResponse(resp *http.Response) (res RegisterUserRes, _ error) {
@@ -348,5 +348,5 @@ func decodeRegisterUserResponse(resp *http.Response) (res RegisterUserRes, _ err
 		// Code 500.
 		return &RegisterUserInternalServerError{}, nil
 	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }

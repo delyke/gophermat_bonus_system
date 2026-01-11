@@ -16,7 +16,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -130,8 +130,9 @@ func (c *Client) sendBalanceWithdrawal(ctx context.Context, request *BalanceWith
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("BalanceWithdrawal"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user/balance/withdraw"),
+		semconv.URLTemplateKey.String("/api/user/balance/withdraw"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -238,8 +239,9 @@ func (c *Client) sendGetOrdersNumberList(ctx context.Context) (res GetOrdersNumb
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("GetOrdersNumberList"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/user/orders"),
+		semconv.URLTemplateKey.String("/api/user/orders"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -343,8 +345,9 @@ func (c *Client) sendGetUserBalance(ctx context.Context) (res GetUserBalanceRes,
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("GetUserBalance"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/user/balance"),
+		semconv.URLTemplateKey.String("/api/user/balance"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -448,8 +451,9 @@ func (c *Client) sendGetWithdrawals(ctx context.Context) (res GetWithdrawalsRes,
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("GetWithdrawals"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/user/withdrawals"),
+		semconv.URLTemplateKey.String("/api/user/withdrawals"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -553,8 +557,9 @@ func (c *Client) sendLoginUser(ctx context.Context, request *LoginRequest) (res 
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("LoginUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user/login"),
+		semconv.URLTemplateKey.String("/api/user/login"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -628,8 +633,9 @@ func (c *Client) sendOrderNumberLoad(ctx context.Context, request OrderNumberLoa
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("OrderNumberLoad"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user/orders"),
+		semconv.URLTemplateKey.String("/api/user/orders"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
@@ -736,8 +742,9 @@ func (c *Client) sendRegisterUser(ctx context.Context, request *RegisterRequest)
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("RegisterUser"),
 		semconv.HTTPRequestMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/api/user/register"),
+		semconv.URLTemplateKey.String("/api/user/register"),
 	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
 	// Run stopwatch.
 	startTime := time.Now()
