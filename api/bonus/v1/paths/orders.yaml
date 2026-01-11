@@ -1,0 +1,49 @@
+post:
+  summary: Загрузка номера заказа
+  operationId: OrderNumberLoad
+  tags:
+    - Business
+  security:
+    - JwtCookieAuth: [ ]
+  requestBody:
+    required: true
+    content:
+      text/plain:
+        schema:
+          $ref: "../components/load_order_number_request.yaml"
+  responses:
+    '200':
+      description: Номер заказа уже был загружен этим пользователем
+    '202':
+      description: Новый номер заказа принят в обработку
+    '400':
+      description: Неверный формат запроса
+    '401':
+      description: Пользователь не аутентифицирован
+    '409':
+      description: Номер заказа уже был загружен другим пользователем
+    '422':
+      description: Неверный формат номера заказа
+    '500':
+      description: Внутренняя ошибка сервера
+
+get:
+  summary: Получение списка загруженных номеров заказов
+  operationId: GetOrdersNumberList
+  tags:
+    - Business
+  security:
+    - JwtCookieAuth: [ ]
+  responses:
+    '200':
+      description: Успешная обработка запроса
+      content:
+        application/json:
+          schema:
+            $ref: "../components/get_orders_number_list_response.yaml"
+    '204':
+      description: Нет данных для ответа
+    '401':
+      description: Пользователь не авторизован
+    '500':
+      description: Внутренняя ошибка сервера

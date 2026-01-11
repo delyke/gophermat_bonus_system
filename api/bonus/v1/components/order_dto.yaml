@@ -1,0 +1,23 @@
+type: object
+required:
+  - number
+  - status
+  - uploaded_at
+properties:
+  number:
+    type: string
+    format: digits only
+    description: Номер заказа
+    example: "9278923470"
+  status:
+    $ref: "./enums/order_status.yaml"
+  accrual:
+    type: number
+    format: float
+    description: Сумма начисления
+    example: 500.5
+  uploaded_at:
+    type: string
+    format: date-time
+    description: Дата загрузки заказа (RFC3339)
+    example: "2020-12-10T15:15:45+07:00"

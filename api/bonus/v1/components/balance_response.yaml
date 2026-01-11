@@ -1,0 +1,15 @@
+type: object
+required:
+  - current
+  - withdrawn
+properties:
+  current:
+    type: number
+    format: float
+    description: Данные о текущей сумме баллов лояльности
+    example: 500.5
+  withdrawn:
+    type: number
+    format: float
+    description: Сумма использованных за весь период регистрации баллов
+    example: 42

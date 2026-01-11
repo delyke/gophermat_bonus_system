@@ -1,0 +1,20 @@
+type: object
+required:
+  - order
+  - sum
+properties:
+  order:
+    type: string
+    format: digits only
+    description: Номер заказа
+    example: "2377225624"
+  sum:
+    type: number
+    format: float
+    description: Сумма вывода
+    example: 500
+  processed_at:
+    type: string
+    format: date-time
+    description: Дата обработки запроса (RFC3339)
+    example: "2020-12-09T16:09:57+07:00"
