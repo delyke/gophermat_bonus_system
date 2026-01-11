@@ -1,0 +1,8 @@
+type: string
+description: Статус заказа
+enum:
+  - NEW
+  - PROCESSING
+  - INVALID
+  - PROCESSED
+example: NEW

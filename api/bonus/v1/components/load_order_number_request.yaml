@@ -1,0 +1,4 @@
+type: string
+pattern: '^[0-9]+$'
+description: Номер заказа, состоящий только из цифр
+example: '123456789'

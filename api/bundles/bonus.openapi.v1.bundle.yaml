@@ -1,0 +1,321 @@
+openapi: 3.0.3
+info:
+  title: Gophermat Bonus System API
+  version: 1.0.0
+  description: Накопительная система лояльности "Гофермат"
+tags:
+  - name: Auth
+    description: Регистрация, аутентификация и авторизация пользователей
+  - name: Business
+    description: Прием номеров заказов, учет и ведение списка переданных номеров заказов зарегистрированного пользователя
+paths:
+  /api/user/register:
+    post:
+      summary: Регистрация пользователя
+      operationId: RegisterUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/register_request'
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован и аутентифицирован
+          headers:
+            Set-Cookie:
+              description: |
+                Устанавливает cookie с JWT токеном.
+                HttpOnly, Secure, SameSite.
+              schema:
+                type: string
+                example: refresh_token=abc.def.ghi; Path=/; HttpOnly; Secure; SameSite=Strict
+        '400':
+          description: Неверный формат запроса
+        '409':
+          description: Логин уже занят
+        '500':
+          description: Внутренняя ошибка сервера
+  /api/user/login:
+    post:
+      summary: Аутентификация пользователя
+      operationId: LoginUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login_request'
+      responses:
+        '200':
+          description: Пользователь успешно аутентифицирован
+          headers:
+            Set-Cookie:
+              description: |
+                Устанавливает cookie с JWT токеном.
+                HttpOnly, Secure, SameSite.
+              schema:
+                type: string
+                example: refresh_token=abc.def.ghi; Path=/; HttpOnly; Secure; SameSite=Strict
+        '400':
+          description: Неверный формат запроса
+        '401':
+          description: Неверная пара логин/пароль
+        '500':
+          description: Внутренняя ошибка сервера
+  /api/user/orders:
+    post:
+      summary: Загрузка номера заказа
+      operationId: OrderNumberLoad
+      tags:
+        - Business
+      security:
+        - JwtCookieAuth: []
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/load_order_number_request'
+      responses:
+        '200':
+          description: Номер заказа уже был загружен этим пользователем
+        '202':
+          description: Новый номер заказа принят в обработку
+        '400':
+          description: Неверный формат запроса
+        '401':
+          description: Пользователь не аутентифицирован
+        '409':
+          description: Номер заказа уже был загружен другим пользователем
+        '422':
+          description: Неверный формат номера заказа
+        '500':
+          description: Внутренняя ошибка сервера
+    get:
+      summary: Получение списка загруженных номеров заказов
+      operationId: GetOrdersNumberList
+      tags:
+        - Business
+      security:
+        - JwtCookieAuth: []
+      responses:
+        '200':
+          description: Успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get_orders_number_list_response'
+        '204':
+          description: Нет данных для ответа
+        '401':
+          description: Пользователь не авторизован
+        '500':
+          description: Внутренняя ошибка сервера
+  /api/user/balance:
+    get:
+      summary: Получение текущего баланса пользователя
+      operationId: GetUserBalance
+      tags:
+        - Business
+      security:
+        - JwtCookieAuth: []
+      responses:
+        '200':
+          description: Успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/balance_response'
+        '401':
+          description: Пользователь не авторизован
+        '500':
+          description: Внутренняя ошибка сервера
+  /api/user/balance/withdraw:
+    post:
+      summary: Запрос на списание средств
+      operationId: BalanceWithdrawal
+      tags:
+        - Business
+      security:
+        - JwtCookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/balance_withdrawal_request'
+      responses:
+        '200':
+          description: Успешная обработка запроса
+        '401':
+          description: Пользователь не авторизован
+        '402':
+          description: На счету недостаточно средств
+        '422':
+          description: Неверный номер заказа
+        '500':
+          description: Внутренняя ошибка сервера
+  /api/user/withdrawals:
+    get:
+      summary: Получение информации о выводе средств
+      operationId: GetWithdrawals
+      tags:
+        - Business
+      security:
+        - JwtCookieAuth: []
+      responses:
+        '200':
+          description: Успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get_withdrawals_response'
+        '204':
+          description: Нет ни одного списания
+        '401':
+          description: Пользователь не авторизован
+        '500':
+          description: Внутренняя ошибка сервера
+components:
+  securitySchemes:
+    JwtCookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: JWT access token, передаётся в cookie `access_token` (HttpOnly)
+  schemas:
+    register_request:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: Логин пользователя
+          example: delyke
+        password:
+          type: string
+          description: Пароль пользователя
+          example: password123
+    login_request:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: Логин пользователя
+          example: delyke
+        password:
+          type: string
+          description: Пароль пользователя
+          example: password123
+    order_status:
+      type: string
+      description: Статус заказа
+      enum:
+        - NEW
+        - PROCESSING
+        - INVALID
+        - PROCESSED
+      example: NEW
+    order_dto:
+      type: object
+      required:
+        - number
+        - status
+        - uploaded_at
+      properties:
+        number:
+          type: string
+          format: digits only
+          description: Номер заказа
+          example: '9278923470'
+        status:
+          $ref: '#/components/schemas/order_status'
+        accrual:
+          type: number
+          format: float
+          description: Сумма начисления
+          example: 500.5
+        uploaded_at:
+          type: string
+          format: date-time
+          description: Дата загрузки заказа (RFC3339)
+          example: '2020-12-10T15:15:45+07:00'
+    get_orders_number_list_response:
+      type: array
+      items:
+        $ref: '#/components/schemas/order_dto'
+    load_order_number_request:
+      type: string
+      pattern: ^[0-9]+$
+      description: Номер заказа, состоящий только из цифр
+      example: '123456789'
+    balance_response:
+      type: object
+      required:
+        - current
+        - withdrawn
+      properties:
+        current:
+          type: number
+          format: float
+          description: Данные о текущей сумме баллов лояльности
+          example: 500.5
+        withdrawn:
+          type: number
+          format: float
+          description: Сумма использованных за весь период регистрации баллов
+          example: 42
+    balance_withdrawal_request:
+      type: object
+      required:
+        - order
+        - sum
+      properties:
+        order:
+          type: string
+          format: digits only
+          description: Номер заказа
+          example: '2377225624'
+        sum:
+          type: number
+          format: float
+          description: Сумма баллов к списанию в счет оплаты
+    withdrawal_dto:
+      type: object
+      required:
+        - order
+        - sum
+      properties:
+        order:
+          type: string
+          format: digits only
+          description: Номер заказа
+          example: '2377225624'
+        sum:
+          type: number
+          format: float
+          description: Сумма вывода
+          example: 500
+        processed_at:
+          type: string
+          format: date-time
+          description: Дата обработки запроса (RFC3339)
+          example: '2020-12-09T16:09:57+07:00'
+    get_withdrawals_response:
+      type: array
+      items:
+        $ref: '#/components/schemas/withdrawal_dto'
+x-ogen:
+  target: ./pkg/openapi/bonus/v1
+  package: bonus_v1
+  clean: true

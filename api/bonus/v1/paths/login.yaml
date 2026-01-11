@@ -1,0 +1,28 @@
+post:
+  summary: Аутентификация пользователя
+  operationId: LoginUser
+  tags:
+    - Auth
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/login_request.yaml"
+  responses:
+    '200':
+      description: Пользователь успешно аутентифицирован
+      headers:
+        Set-Cookie:
+          description: |
+            Устанавливает cookie с JWT токеном.
+            HttpOnly, Secure, SameSite.
+          schema:
+            type: string
+            example: refresh_token=abc.def.ghi; Path=/; HttpOnly; Secure; SameSite=Strict
+    '400':
+      description: Неверный формат запроса
+    '401':
+      description: Неверная пара логин/пароль
+    '500':
+      description: Внутренняя ошибка сервера

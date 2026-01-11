@@ -1,0 +1,24 @@
+post:
+  summary: Запрос на списание средств
+  operationId: BalanceWithdrawal
+  tags:
+    - Business
+  security:
+    - JwtCookieAuth: [ ]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/balance_withdrawal_request.yaml"
+  responses:
+    '200':
+      description: Успешная обработка запроса
+    '401':
+      description: Пользователь не авторизован
+    '402':
+      description: На счету недостаточно средств
+    '422':
+      description: Неверный номер заказа
+    '500':
+      description: Внутренняя ошибка сервера

@@ -1,0 +1,28 @@
+post:
+  summary: Регистрация пользователя
+  operationId: RegisterUser
+  tags:
+    - Auth
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/register_request.yaml"
+  responses:
+    '200':
+      description: Пользователь успешно зарегистрирован и аутентифицирован
+      headers:
+        Set-Cookie:
+          description: |
+            Устанавливает cookie с JWT токеном.
+            HttpOnly, Secure, SameSite.
+          schema:
+            type: string
+            example: refresh_token=abc.def.ghi; Path=/; HttpOnly; Secure; SameSite=Strict
+    '400':
+      description: Неверный формат запроса
+    '409':
+      description: Логин уже занят
+    '500':
+      description: Внутренняя ошибка сервера
