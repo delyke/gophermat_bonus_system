@@ -8,6 +8,7 @@ vars:
   GOFUMPT_VERSION: 'v0.8.0'
   OGEN_VERSION: 'v1.18.0'
   YQ_VERSION: 'v4.45.2'
+  ENVSUBST_VERSION: 'v1.4.3'
 
   BIN_DIR: '{{.ROOT_DIR}}/bin'
   GOLANGCI_LINT: '{{.BIN_DIR}}/golangci-lint'
@@ -15,6 +16,8 @@ vars:
   GOFUMPT: '{{.BIN_DIR}}/gofumpt'
   OGEN: '{{.BIN_DIR}}/ogen'
   YQ: '{{.BIN_DIR}}/yq'
+  ENVSUBST: '{{.BIN_DIR}}/envsubst'
+  ENVDIR: '{{.ROOT_DIR}}/deploy/env'
 
   NODE_MODULES_DIR: '{{.ROOT_DIR}}/node_modules/.bin'
   REDOCLY: '{{.NODE_MODULES_DIR}}/redocly'
@@ -22,6 +25,8 @@ vars:
   OPEN_API_BONUS_V1_BASE: '{{.ROOT_DIR}}/api/bonus/v1/bonus.openapi.yaml'
   OPEN_API_BONUS_V1_BUNDLE: '{{.ROOT_DIR}}/api/bundles/bonus.openapi.v1.bundle.yaml'
   OPEN_API_FILES: '{{.ROOT_DIR}}/api/bundles'
+
+  SERVICES: bonus,accrual
 
 tasks:
   install-formatters:
@@ -130,3 +135,86 @@ tasks:
           echo '📦 Installing yq...'
           GOBIN={{.BIN_DIR}} go install github.com/mikefarah/yq/v4@{{.YQ_VERSION}}
         }
+
+  env:install-envsubst:
+    desc: "Устанавливает envsubst в bin/"
+    cmds:
+      - |
+        [ -f {{.ENVSUBST}} ] || {
+          echo "📦 Устанавливаем envsubst версии {{.ENVSUBST_VERSION}}..."
+          GOBIN={{.BIN_DIR}} go install github.com/a8m/envsubst/cmd/envsubst@{{.ENVSUBST_VERSION}}
+        }
+        echo "✅ envsubst установлен: {{.ENVSUBST}}"
+
+  env:generate:
+    desc: "Генерирует .env файлы для всех сервисов из шаблонов и единого файла конфигурации"
+    deps: [ env:install-envsubst ]
+    cmds:
+      - |
+        ENV_FILE="{{.ENVDIR}}/.env"
+        TEMPLATE_FILE="{{.ENVDIR}}/.env.template"
+        SCRIPT="{{.ENVDIR}}/generate-env.sh"
+        
+        if [ ! -f "$ENV_FILE" ]; then
+          if [ -f "$TEMPLATE_FILE" ]; then
+            echo "🔄 Файл $ENV_FILE не найден, создаем из шаблона $TEMPLATE_FILE"
+            cp "$TEMPLATE_FILE" "$ENV_FILE"
+            echo "✅ Создан файл $ENV_FILE. Проверьте и отредактируйте значения переменных при необходимости."
+          else
+            echo "❌ Шаблон $TEMPLATE_FILE не найден!"
+            exit 1
+          fi
+        fi
+        
+        chmod +x "$SCRIPT"
+        # Передаем список сервисов в виде строки с разделителями-запятыми
+        export SERVICES="{{.SERVICES}}"
+        ENV_SUBST={{.ENVSUBST}} bash "$SCRIPT"
+  up-core:
+    desc: Поднять core контейнеры
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🚀 Поднимаем core контейнеры"
+      - docker compose up --build --detach
+  down-core:
+    desc: Остановить и удалить core контейнеры
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🛑 Останавливаем core контейнеры"
+      - docker compose down --volumes
+  up-bonus:
+    desc: Поднять Bonus сервис и все его зависимости
+    dir: deploy/compose/bonus
+    cmds:
+      - echo "[task] 📦 Поднимаем Bonus с зависимостями"
+      - docker compose up --build --detach
+  down-bonus:
+    desc: Остановить и удалить Bonus сервис и все его зависимости
+    dir: deploy/compose/bonus
+    cmds:
+      - echo "[task] 🛑 Останавливаем Bonus с зависимостями"
+      - docker compose down --volumes
+  up-accrual:
+    desc: Поднять Accrual сервис и все его зависимости
+    dir: deploy/compose/accrual
+    cmds:
+      - echo "[task] 📦 Поднимаем Accrual с зависимостями"
+      - docker compose up --build --detach
+  down-accrual:
+    desc: Остановить и удалить Accrual сервис и все его зависимости
+    dir: deploy/compose/accrual
+    cmds:
+      - echo "[task] 🛑 Останавливаем Accrual с зависимостями"
+      - docker compose down --volumes
+  up-all:
+    desc: Поднять все сервисы по очереди вместе с зависимостями
+    cmds:
+      - task up-core
+      - task up-accrual
+      - task up-bonus
+  down-all:
+    desc: Остановить и удалить все сервисы по очереди вместе с зависимостями
+    cmds:
+      - task down-core
+      - task down-accrual
+      - task down-bonus

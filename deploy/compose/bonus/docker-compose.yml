@@ -1,0 +1,27 @@
+services:
+  postgres-bonus:
+    image: postgres:17.0-alpine3.20
+    container_name: postgres-bonus
+    env_file:
+      - .env
+    volumes:
+      - postgres_bonus_data:/var/lib/postgresql/data
+
+    ports:
+      - "${EXTERNAL_POSTGRES_PORT}:${POSTGRES_PORT}"
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      # Настраиваем проверку готовности контейнера — pg_isready проверяет, принимает ли база подключения
+      interval: 10s  # Интервал между проверками — каждые 10 секунд
+      timeout: 5s    # Время ожидания ответа от проверки
+      retries: 5     # После 5 неудачных попыток подряд контейнер считается "unhealthy"
+    restart: unless-stopped
+    networks:
+      - gophermat-bonus-net
+volumes:
+  postgres_bonus_data:
+
+networks:
+  gophermat-bonus-net:
+    external: true
