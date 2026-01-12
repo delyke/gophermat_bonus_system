@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/delyke/gophermat_bonus_system/internal/closer"
 	"github.com/delyke/gophermat_bonus_system/internal/config"
 	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/migrator"
@@ -31,6 +32,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initDI,
 		a.initLogger,
 		a.initMigrator,
+		a.initCloser,
 	}
 
 	for _, f := range inits {
@@ -51,6 +53,11 @@ func (a *App) initLogger(_ context.Context) error {
 		config.Get().Logger.Level(),
 		config.Get().Logger.AsJson(),
 	)
+}
+
+func (a *App) initCloser(_ context.Context) error {
+	closer.SetLogger(logger.Logger())
+	return nil
 }
 
 func (a *App) initMigrator(ctx context.Context) error {
