@@ -20,7 +20,7 @@ var (
 // Postgres flags
 var (
 	PgHost             = "localhost"
-	PgPort             = 5432
+	PgPort             = 5435
 	PgUser             = "bonus-service-user"
 	PgPassword         = "bonus-service-password"
 	PgDatabase         = "bonus-service"

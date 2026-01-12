@@ -85,14 +85,6 @@ func SetLevel(levelStr string) {
 	dynamicLevel.SetLevel(parseLevel(levelStr))
 }
 
-func InitForBenchmark() {
-	core := zapcore.NewNopCore()
-
-	globalLogger = &logger{
-		zapLogger: zap.New(core),
-	}
-}
-
 // logger возвращает глобальный enrich-aware логгер
 func Logger() *logger {
 	return globalLogger

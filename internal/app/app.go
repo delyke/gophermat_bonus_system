@@ -3,7 +3,10 @@ package app
 import (
 	"context"
 	"github.com/delyke/gophermat_bonus_system/internal/config"
-	"github.com/delyke/gophermat_bonus_system/logger"
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
+	"github.com/delyke/gophermat_bonus_system/internal/migrator"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -27,6 +30,7 @@ func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		a.initDI,
 		a.initLogger,
+		a.initMigrator,
 	}
 
 	for _, f := range inits {
@@ -47,6 +51,21 @@ func (a *App) initLogger(_ context.Context) error {
 		config.Get().Logger.Level(),
 		config.Get().Logger.AsJson(),
 	)
+}
+
+func (a *App) initMigrator(ctx context.Context) error {
+	poolcfg, err := pgxpool.ParseConfig(config.Get().Postgres.URI())
+	if err != nil {
+		return err
+	}
+
+	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*poolcfg.ConnConfig), config.Get().Postgres.MigrationDirectory())
+	err = migratorRunner.Up(ctx)
+	if err != nil {
+		return err
+	}
+	logger.Info(ctx, "migrations applied")
+	return nil
 }
 
 func (a *App) ShowConfig(ctx context.Context) error {
