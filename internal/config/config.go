@@ -18,6 +18,7 @@ type config struct {
 	Postgres PostgresConfig
 	HTTP     BonusHTTPConfig
 	Accrual  AccrualConfig
+	JWT      JWTConfig
 }
 
 // Partial — частичная конфигурация: поля nil означают “источник не задавал секцию”.
@@ -26,6 +27,7 @@ type partial struct {
 	Postgres *PostgresConfig
 	HTTP     *BonusHTTPConfig
 	Accrual  *AccrualConfig
+	JWT      *JWTConfig
 }
 
 // Load загружает конфигурацию, применяя приоритет:
@@ -74,6 +76,9 @@ func (c *config) apply(p partial) {
 	if p.HTTP != nil {
 		c.HTTP = *p.HTTP
 	}
+	if p.JWT != nil {
+		c.JWT = *p.JWT
+	}
 }
 
 // defaultConfig - место для дефолтов.
@@ -83,6 +88,7 @@ func defaultConfig() config {
 	c.Logger = defaults.NewDefaultLoggerConfig()
 	c.Postgres = defaults.NewPostgresDefaultConfig()
 	c.Accrual = defaults.NewAccrualDefaultConfig()
+	c.JWT = defaults.NewJwtConfig()
 	return c
 }
 
@@ -123,6 +129,15 @@ func loadFlagPartial() (partial, error) {
 	if httpCfg != nil {
 		var v BonusHTTPConfig = httpCfg
 		out.HTTP = &v
+	}
+
+	jwtCfg, err := flagCfg.NewJwtFlagConfig()
+	if err != nil {
+		return partial{}, err
+	}
+	if jwtCfg != nil {
+		var v JWTConfig = jwtCfg
+		out.JWT = &v
 	}
 
 	return out, nil
@@ -177,6 +192,15 @@ func loadEnvPartial(paths ...string) (partial, error) {
 	if httpCfg != nil {
 		var v BonusHTTPConfig = httpCfg
 		out.HTTP = &v
+	}
+
+	jwtCfg, err := env.NewJwtConfig()
+	if err != nil {
+		return partial{}, err
+	}
+	if jwtCfg != nil {
+		var v JWTConfig = jwtCfg
+		out.JWT = &v
 	}
 
 	return out, nil

@@ -31,6 +31,12 @@ func main() {
 		return
 	}
 	_ = a.ShowConfig(appCtx)
+
+	err = a.Run(appCtx)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func gracefulShutdown() {

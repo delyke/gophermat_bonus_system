@@ -50,6 +50,10 @@ type Handler interface {
 	//
 	// POST /api/user/register
 	RegisterUser(ctx context.Context, req *RegisterRequest) (RegisterUserRes, error)
+	// NewError creates *GenericErrorStatusCode from error returned by handler.
+	//
+	// Used for common default response.
+	NewError(ctx context.Context, err error) *GenericErrorStatusCode
 }
 
 // Server implements http server based on OpenAPI v3 specification and

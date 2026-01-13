@@ -75,3 +75,11 @@ func (UnimplementedHandler) OrderNumberLoad(ctx context.Context, req OrderNumber
 func (UnimplementedHandler) RegisterUser(ctx context.Context, req *RegisterRequest) (r RegisterUserRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// NewError creates *GenericErrorStatusCode from error returned by handler.
+//
+// Used for common default response.
+func (UnimplementedHandler) NewError(ctx context.Context, err error) (r *GenericErrorStatusCode) {
+	r = new(GenericErrorStatusCode)
+	return r
+}

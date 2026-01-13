@@ -3,11 +3,16 @@
 package bonus_v1
 
 import (
+	"fmt"
 	"io"
 	"time"
 
 	"github.com/go-faster/errors"
 )
+
+func (s *GenericErrorStatusCode) Error() string {
+	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
+}
 
 // Ref: #/components/schemas/balance_response
 type BalanceResponse struct {
@@ -92,6 +97,60 @@ func (*BalanceWithdrawalUnauthorized) balanceWithdrawalRes() {}
 type BalanceWithdrawalUnprocessableEntity struct{}
 
 func (*BalanceWithdrawalUnprocessableEntity) balanceWithdrawalRes() {}
+
+// Ref: #/components/schemas/generic_error
+type GenericError struct {
+	// HTTP-код ошибки.
+	Code OptInt `json:"code"`
+	// Описание ошибки.
+	Message OptString `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GenericError) GetCode() OptInt {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GenericError) GetMessage() OptString {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GenericError) SetCode(val OptInt) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GenericError) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// GenericErrorStatusCode wraps GenericError with StatusCode.
+type GenericErrorStatusCode struct {
+	StatusCode int
+	Response   GenericError
+}
+
+// GetStatusCode returns the value of StatusCode.
+func (s *GenericErrorStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
+
+// GetResponse returns the value of Response.
+func (s *GenericErrorStatusCode) GetResponse() GenericError {
+	return s.Response
+}
+
+// SetStatusCode sets the value of StatusCode.
+func (s *GenericErrorStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
+
+// SetResponse sets the value of Response.
+func (s *GenericErrorStatusCode) SetResponse(val GenericError) {
+	s.Response = val
+}
 
 // GetOrdersNumberListInternalServerError is response for GetOrdersNumberList operation.
 type GetOrdersNumberListInternalServerError struct{}
@@ -312,6 +371,52 @@ func (o OptFloat32) Get() (v float32, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptFloat32) Or(d float32) float32 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
 	if v, ok := o.Get(); ok {
 		return v
 	}

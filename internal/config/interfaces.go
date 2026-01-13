@@ -26,3 +26,8 @@ type BonusHTTPConfig interface {
 type AccrualConfig interface {
 	SystemAddress() string
 }
+
+type JWTConfig interface {
+	Secret() string
+	TTL() time.Duration
+}

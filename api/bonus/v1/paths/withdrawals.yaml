@@ -18,3 +18,9 @@ get:
       description: Пользователь не авторизован
     '500':
       description: Внутренняя ошибка сервера
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/generic_error.yaml

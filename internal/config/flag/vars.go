@@ -27,3 +27,9 @@ var (
 	databaseURI        = FS.String("d", "", "Postgres database URI")
 	migrationDirectory = FS.String("mdir", "", "Directory where migrations")
 )
+
+// JWT flags
+var (
+	jwtSecret = FS.String("jwt_secret", "", "Secret used to sign JWT")
+	jwtTTL    = FS.String("jwt_ttl", "", "TTL of JWT")
+)

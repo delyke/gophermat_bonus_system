@@ -71,7 +71,7 @@ func buildProductionEncoderConfig() zapcore.EncoderConfig {
 		EncodeLevel:    zapcore.CapitalLevelEncoder, // INFO, ERROR
 		EncodeTime:     zapcore.ISO8601TimeEncoder,  // читаемый ISO 8601 формат
 		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder, // короткий caller
+		EncodeCaller:   zapcore.FullCallerEncoder, // полный caller
 		EncodeName:     zapcore.FullNameEncoder,
 	}
 }

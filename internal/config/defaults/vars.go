@@ -6,18 +6,18 @@ var (
 	LoggerAsJson   = true
 )
 
-// Accrual flags
+// Accrual defaults
 var (
 	AccrualSystemAddress = "localhost:8081"
 )
 
-// Bonus HTTP
+// Bonus HTTP defaults
 var (
 	BonusRunAddress  = ":8080"
 	BonusReadTimeout = "10s"
 )
 
-// Postgres flags
+// Postgres defaults
 var (
 	PgHost             = "localhost"
 	PgPort             = 5435
@@ -26,4 +26,10 @@ var (
 	PgDatabase         = "bonus-service"
 	PgDatabaseURI      = ""
 	MigrationDirectory = "./migrations"
+)
+
+// JWT defaults
+var (
+	JWTSecret = "bonus-service-jwt-secret"
+	JWTTTL    = "1d"
 )

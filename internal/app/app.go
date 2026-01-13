@@ -2,19 +2,24 @@ package app
 
 import (
 	"context"
+	"errors"
 	"github.com/delyke/gophermat_bonus_system/internal/closer"
 	"github.com/delyke/gophermat_bonus_system/internal/config"
 	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/migrator"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 	"net/http"
+	"time"
 )
 
 type App struct {
 	diContainer *diContainer
 	httpServer  *http.Server
+	router      *chi.Mux
 }
 
 func New(ctx context.Context) (*App, error) {
@@ -33,6 +38,8 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initLogger,
 		a.initMigrator,
 		a.initCloser,
+		a.initRouter,
+		a.initServer,
 	}
 
 	for _, f := range inits {
@@ -75,6 +82,42 @@ func (a *App) initMigrator(ctx context.Context) error {
 	return nil
 }
 
+func (a *App) initRouter(ctx context.Context) error {
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Timeout(10 * time.Second))
+	r.Mount("/", a.diContainer.BonusServer(ctx))
+	a.router = r
+	return nil
+}
+
+func (a *App) initServer(_ context.Context) error {
+	server := &http.Server{
+		Addr:              config.Get().HTTP.RunAddress(),
+		Handler:           a.router,
+		ReadHeaderTimeout: config.Get().HTTP.ReadTimeout(),
+	}
+	a.httpServer = server
+	return nil
+}
+
+func (a *App) runHTTPServer(ctx context.Context) error {
+	logger.Info(ctx, "starting http server", zap.String("RunAddress:", config.Get().HTTP.RunAddress()))
+	closer.AddNamed("HTTP Server", func(ctx context.Context) error {
+		return a.httpServer.Shutdown(ctx)
+	})
+	err := a.httpServer.ListenAndServe()
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	return nil
+}
+
+func (a *App) Run(ctx context.Context) error {
+	return a.runHTTPServer(ctx)
+}
+
 func (a *App) ShowConfig(ctx context.Context) error {
 	logger.Debug(ctx, "App configuration:", zap.Any("config", config.Get()))
 	logger.Debug(ctx,
@@ -105,5 +148,9 @@ func (a *App) ShowConfig(ctx context.Context) error {
 		zap.String("URI", config.Get().Postgres.URI()),
 		zap.String("Migrations dir", config.Get().Postgres.MigrationDirectory()),
 	)
+
+	logger.Debug(ctx,
+		"JWT Config:",
+		zap.Any("Secret", config.Get().JWT.Secret()))
 	return nil
 }
