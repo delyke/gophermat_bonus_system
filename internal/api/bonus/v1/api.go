@@ -3,12 +3,14 @@ package v1
 import (
 	"context"
 	"errors"
+	"net/http"
+	"time"
+
+	"github.com/ogen-go/ogen/ogenerrors"
+
 	"github.com/delyke/gophermat_bonus_system/internal/config"
 	"github.com/delyke/gophermat_bonus_system/internal/service"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
-	"github.com/ogen-go/ogen/ogenerrors"
-	"net/http"
-	"time"
 )
 
 type api struct {
@@ -21,11 +23,13 @@ func NewApi(bs service.BonusService) *api {
 }
 
 func (a *api) NewError(_ context.Context, err error) *bonusV1.GenericErrorStatusCode {
-	statusCode := http.StatusInternalServerError
+	var statusCode int
 	if err != nil {
 		switch {
 		case errors.Is(err, ogenerrors.ErrSecurityRequirementIsNotSatisfied):
 			statusCode = http.StatusUnauthorized
+		default:
+			statusCode = http.StatusInternalServerError
 		}
 	}
 	return &bonusV1.GenericErrorStatusCode{

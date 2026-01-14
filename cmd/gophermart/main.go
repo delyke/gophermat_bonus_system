@@ -3,21 +3,23 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/delyke/gophermat_bonus_system/internal/app"
-	"github.com/delyke/gophermat_bonus_system/internal/closer"
-	"github.com/delyke/gophermat_bonus_system/internal/config"
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
-	"go.uber.org/zap"
 	"log"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"go.uber.org/zap"
+
+	"github.com/delyke/gophermat_bonus_system/internal/app"
+	"github.com/delyke/gophermat_bonus_system/internal/closer"
+	"github.com/delyke/gophermat_bonus_system/internal/config"
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
 )
 
 func main() {
 	err := config.Load()
 	if err != nil {
-		panic(fmt.Errorf("error loading config: %v", err))
+		panic(fmt.Errorf("error loading config: %w", err))
 	}
 	appCtx, appCancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer appCancel()
@@ -30,7 +32,11 @@ func main() {
 		log.Println(err)
 		return
 	}
-	_ = a.ShowConfig(appCtx)
+	err = a.ShowConfig(appCtx)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	err = a.Run(appCtx)
 	if err != nil {

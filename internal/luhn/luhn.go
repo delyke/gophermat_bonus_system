@@ -21,7 +21,7 @@ func Validate(s []byte) (bool, error) {
 	return sum%10 == 0, nil
 }
 
-func sumLuhn(s []byte, includeLast bool) (sum int, digits int, err error) {
+func sumLuhn(s []byte, includeLast bool) (sum, digits int, err error) {
 	// Считает кол-во цифр
 	for _, c := range s {
 		switch {

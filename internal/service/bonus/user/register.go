@@ -2,13 +2,15 @@ package user
 
 import (
 	"context"
+
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/delyke/gophermat_bonus_system/internal/config"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // Register - создает хэш пароля, записывает логин и пароль в БД и выдает токен
-func (s *service) Register(ctx context.Context, login string, password string) (string, error) {
+func (s *service) Register(ctx context.Context, login, password string) (string, error) {
 	if login == "" || password == "" {
 		return "", model.ErrBadCredentials
 	}

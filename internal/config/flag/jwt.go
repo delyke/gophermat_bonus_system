@@ -1,8 +1,9 @@
 package flag
 
 import (
-	"github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 	"time"
+
+	"github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 )
 
 type jwtFlagConfig struct {
@@ -15,24 +16,31 @@ type jwtConfig struct {
 }
 
 func NewJwtFlagConfig() (*jwtConfig, error) {
-	var raw jwtFlagConfig
-	flagWasSet := false
+	raw := &jwtFlagConfig{}
 
-	if WasSet("jwt_secret") {
-		raw.Secret = jwtSecret
-		flagWasSet = true
-	}
+	cfg := newFlagConfig(
+		raw,
+		func() bool {
+			if WasSet("jwt_secret") {
+				raw.Secret = jwtSecret
+				return true
+			}
+			return false
+		},
+		func() bool {
+			if WasSet("jwt_ttl") {
+				raw.TTL = jwtTTL
+				return true
+			}
+			return false
+		},
+	)
 
-	if WasSet("jwt_ttl") {
-		raw.TTL = jwtTTL
-		flagWasSet = true
-	}
-
-	if !flagWasSet {
+	if cfg == nil {
 		return nil, nil
 	}
 
-	return &jwtConfig{raw: raw}, nil
+	return &jwtConfig{raw: *cfg}, nil
 }
 
 func (j *jwtConfig) Secret() string {
@@ -43,15 +51,8 @@ func (j *jwtConfig) Secret() string {
 }
 
 func (j *jwtConfig) TTL() time.Duration {
-	var ttl time.Duration
-	var err error
-	if j == nil || j.raw.TTL == nil {
-		ttl, err = time.ParseDuration(defaults.JWTTTL)
-	} else {
-		ttl, err = time.ParseDuration(*j.raw.TTL)
+	if j == nil {
+		return parseDurationOrDefault(nil, defaults.JWTTTL, 24*time.Hour)
 	}
-	if err != nil {
-		return 24 * time.Hour
-	}
-	return ttl
+	return parseDurationOrDefault(j.raw.TTL, defaults.JWTTTL, 24*time.Hour)
 }

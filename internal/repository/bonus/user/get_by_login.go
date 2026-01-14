@@ -2,11 +2,13 @@ package user
 
 import (
 	"context"
+
 	sq "github.com/Masterminds/squirrel"
+	"github.com/google/uuid"
+
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
 	repoModel "github.com/delyke/gophermat_bonus_system/internal/repository/model"
-	"github.com/google/uuid"
 )
 
 func (repo *repository) GetByLogin(ctx context.Context, login string) (*model.User, error) {

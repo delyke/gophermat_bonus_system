@@ -1,8 +1,9 @@
 package flag
 
 import (
-	"github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 	"time"
+
+	"github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 )
 
 type httpEnvConfig struct {
@@ -15,23 +16,30 @@ type httpConfig struct {
 }
 
 func NewHTTPConfig() (*httpConfig, error) {
-	var raw httpEnvConfig
-	flagWasSet := false
+	raw := &httpEnvConfig{}
 
-	if WasSet("a") {
-		raw.RunAddress = runAddress
-		flagWasSet = true
-	}
+	cfg := newFlagConfig(
+		raw,
+		func() bool {
+			if WasSet("a") {
+				raw.RunAddress = runAddress
+				return true
+			}
+			return false
+		},
+		func() bool {
+			if WasSet("rt") {
+				raw.ReadTimeout = readTimeout
+				return true
+			}
+			return false
+		},
+	)
 
-	if WasSet("rt") {
-		raw.ReadTimeout = readTimeout
-		flagWasSet = true
-	}
-
-	if !flagWasSet {
+	if cfg == nil {
 		return nil, nil
 	}
-	return &httpConfig{raw: raw}, nil
+	return &httpConfig{raw: *cfg}, nil
 }
 
 func (c *httpConfig) RunAddress() string {
@@ -42,15 +50,8 @@ func (c *httpConfig) RunAddress() string {
 }
 
 func (c *httpConfig) ReadTimeout() time.Duration {
-	var timeout time.Duration
-	var err error
-	if c == nil || c.raw.ReadTimeout == nil {
-		timeout, err = time.ParseDuration(defaults.BonusReadTimeout)
-	} else {
-		timeout, err = time.ParseDuration(*c.raw.ReadTimeout)
+	if c == nil {
+		return parseDurationOrDefault(nil, defaults.BonusReadTimeout, 10*time.Second)
 	}
-	if err != nil {
-		return 10 * time.Second
-	}
-	return timeout
+	return parseDurationOrDefault(c.raw.ReadTimeout, defaults.BonusReadTimeout, 10*time.Second)
 }

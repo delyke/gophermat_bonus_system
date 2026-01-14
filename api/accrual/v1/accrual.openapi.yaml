@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info:
+  title: Accrual API
+  version: 1.0.0
+  description: Система расчета начислнеий баллов лояльности
+x-ogen:
+  target: ./pkg/openapi/accrual/v1
+  package: accrual_v1
+  clean: true
+
+paths:
+  /api/orders/{number}:
+    $ref: "./paths/order_by_number.yaml"

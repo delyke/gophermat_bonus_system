@@ -3,10 +3,11 @@ package config
 import (
 	"os"
 
+	"github.com/joho/godotenv"
+
 	defaults "github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 	"github.com/delyke/gophermat_bonus_system/internal/config/env"
 	flagCfg "github.com/delyke/gophermat_bonus_system/internal/config/flag"
-	"github.com/joho/godotenv"
 )
 
 // appConfig - глобальная конфигурация приложения

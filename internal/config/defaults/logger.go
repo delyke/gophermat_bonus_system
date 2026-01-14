@@ -19,6 +19,7 @@ func NewDefaultLoggerConfig() *loggerConfig {
 func (ld *loggerConfig) Level() string {
 	return ld.raw.Level
 }
+
 func (ld *loggerConfig) AsJson() bool {
 	return ld.raw.AsJson
 }

@@ -1,8 +1,9 @@
 package user
 
 import (
-	def "github.com/delyke/gophermat_bonus_system/internal/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	def "github.com/delyke/gophermat_bonus_system/internal/repository"
 )
 
 var _ def.UserRepository = (*repository)(nil)

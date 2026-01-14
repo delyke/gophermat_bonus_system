@@ -1,0 +1,31 @@
+parameters:
+  - $ref: ../params/order_number.yaml
+
+get:
+  summary: Получение информации о расчете начислений баллов лояльности
+  operationId: GetOrderInfo
+  responses:
+    '200':
+      description: Успешная обработка запроса
+      content:
+        application/json:
+          schema:
+            $ref: "../components/get_order_info_response.yaml"
+    '204':
+      description: Заказ не зарегистрирован в системе расчета
+    '429':
+      description: Превышено количество запросов к сервису
+      headers:
+        Retry-After:
+          description: |
+            Количество секунд для ожидания перед выполнением запроса
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: No more than N requests per minute allowed
+    '500':
+      description: Внутренняя ошибка сервера

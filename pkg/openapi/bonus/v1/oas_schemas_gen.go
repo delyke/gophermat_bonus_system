@@ -17,29 +17,29 @@ func (s *GenericErrorStatusCode) Error() string {
 // Ref: #/components/schemas/balance_response
 type BalanceResponse struct {
 	// Данные о текущей сумме баллов лояльности.
-	Current float32 `json:"current"`
+	Current float64 `json:"current"`
 	// Сумма использованных за весь период регистрации
 	// баллов.
-	Withdrawn float32 `json:"withdrawn"`
+	Withdrawn float64 `json:"withdrawn"`
 }
 
 // GetCurrent returns the value of Current.
-func (s *BalanceResponse) GetCurrent() float32 {
+func (s *BalanceResponse) GetCurrent() float64 {
 	return s.Current
 }
 
 // GetWithdrawn returns the value of Withdrawn.
-func (s *BalanceResponse) GetWithdrawn() float32 {
+func (s *BalanceResponse) GetWithdrawn() float64 {
 	return s.Withdrawn
 }
 
 // SetCurrent sets the value of Current.
-func (s *BalanceResponse) SetCurrent(val float32) {
+func (s *BalanceResponse) SetCurrent(val float64) {
 	s.Current = val
 }
 
 // SetWithdrawn sets the value of Withdrawn.
-func (s *BalanceResponse) SetWithdrawn(val float32) {
+func (s *BalanceResponse) SetWithdrawn(val float64) {
 	s.Withdrawn = val
 }
 
@@ -65,7 +65,7 @@ type BalanceWithdrawalRequest struct {
 	// Номер заказа.
 	Order string `json:"order"`
 	// Сумма баллов к списанию в счет оплаты.
-	Sum float32 `json:"sum"`
+	Sum float64 `json:"sum"`
 }
 
 // GetOrder returns the value of Order.
@@ -74,7 +74,7 @@ func (s *BalanceWithdrawalRequest) GetOrder() string {
 }
 
 // GetSum returns the value of Sum.
-func (s *BalanceWithdrawalRequest) GetSum() float32 {
+func (s *BalanceWithdrawalRequest) GetSum() float64 {
 	return s.Sum
 }
 
@@ -84,7 +84,7 @@ func (s *BalanceWithdrawalRequest) SetOrder(val string) {
 }
 
 // SetSum sets the value of Sum.
-func (s *BalanceWithdrawalRequest) SetSum(val float32) {
+func (s *BalanceWithdrawalRequest) SetSum(val float64) {
 	s.Sum = val
 }
 
@@ -285,38 +285,38 @@ type LoginUserUnauthorized struct{}
 
 func (*LoginUserUnauthorized) loginUserRes() {}
 
-// NewOptDateTime returns new OptDateTime with value set to v.
-func NewOptDateTime(v time.Time) OptDateTime {
-	return OptDateTime{
+// NewOptFloat64 returns new OptFloat64 with value set to v.
+func NewOptFloat64(v float64) OptFloat64 {
+	return OptFloat64{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptDateTime is optional time.Time.
-type OptDateTime struct {
-	Value time.Time
+// OptFloat64 is optional float64.
+type OptFloat64 struct {
+	Value float64
 	Set   bool
 }
 
-// IsSet returns true if OptDateTime was set.
-func (o OptDateTime) IsSet() bool { return o.Set }
+// IsSet returns true if OptFloat64 was set.
+func (o OptFloat64) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptDateTime) Reset() {
-	var v time.Time
+func (o *OptFloat64) Reset() {
+	var v float64
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptDateTime) SetTo(v time.Time) {
+func (o *OptFloat64) SetTo(v float64) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptDateTime) Get() (v time.Time, ok bool) {
+func (o OptFloat64) Get() (v float64, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -324,53 +324,7 @@ func (o OptDateTime) Get() (v time.Time, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptDateTime) Or(d time.Time) time.Time {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptFloat32 returns new OptFloat32 with value set to v.
-func NewOptFloat32(v float32) OptFloat32 {
-	return OptFloat32{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptFloat32 is optional float32.
-type OptFloat32 struct {
-	Value float32
-	Set   bool
-}
-
-// IsSet returns true if OptFloat32 was set.
-func (o OptFloat32) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptFloat32) Reset() {
-	var v float32
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptFloat32) SetTo(v float32) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptFloat32) Get() (v float32, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptFloat32) Or(d float32) float32 {
+func (o OptFloat64) Or(d float64) float64 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -475,7 +429,7 @@ type OrderDto struct {
 	Number string      `json:"number"`
 	Status OrderStatus `json:"status"`
 	// Сумма начисления.
-	Accrual OptFloat32 `json:"accrual"`
+	Accrual OptFloat64 `json:"accrual"`
 	// Дата загрузки заказа (RFC3339).
 	UploadedAt time.Time `json:"uploaded_at"`
 }
@@ -491,7 +445,7 @@ func (s *OrderDto) GetStatus() OrderStatus {
 }
 
 // GetAccrual returns the value of Accrual.
-func (s *OrderDto) GetAccrual() OptFloat32 {
+func (s *OrderDto) GetAccrual() OptFloat64 {
 	return s.Accrual
 }
 
@@ -511,7 +465,7 @@ func (s *OrderDto) SetStatus(val OrderStatus) {
 }
 
 // SetAccrual sets the value of Accrual.
-func (s *OrderDto) SetAccrual(val OptFloat32) {
+func (s *OrderDto) SetAccrual(val OptFloat64) {
 	s.Accrual = val
 }
 
@@ -693,9 +647,9 @@ type WithdrawalDto struct {
 	// Номер заказа.
 	Order string `json:"order"`
 	// Сумма вывода.
-	Sum float32 `json:"sum"`
+	Sum float64 `json:"sum"`
 	// Дата обработки запроса (RFC3339).
-	ProcessedAt OptDateTime `json:"processed_at"`
+	ProcessedAt time.Time `json:"processed_at"`
 }
 
 // GetOrder returns the value of Order.
@@ -704,12 +658,12 @@ func (s *WithdrawalDto) GetOrder() string {
 }
 
 // GetSum returns the value of Sum.
-func (s *WithdrawalDto) GetSum() float32 {
+func (s *WithdrawalDto) GetSum() float64 {
 	return s.Sum
 }
 
 // GetProcessedAt returns the value of ProcessedAt.
-func (s *WithdrawalDto) GetProcessedAt() OptDateTime {
+func (s *WithdrawalDto) GetProcessedAt() time.Time {
 	return s.ProcessedAt
 }
 
@@ -719,11 +673,11 @@ func (s *WithdrawalDto) SetOrder(val string) {
 }
 
 // SetSum sets the value of Sum.
-func (s *WithdrawalDto) SetSum(val float32) {
+func (s *WithdrawalDto) SetSum(val float64) {
 	s.Sum = val
 }
 
 // SetProcessedAt sets the value of ProcessedAt.
-func (s *WithdrawalDto) SetProcessedAt(val OptDateTime) {
+func (s *WithdrawalDto) SetProcessedAt(val time.Time) {
 	s.ProcessedAt = val
 }

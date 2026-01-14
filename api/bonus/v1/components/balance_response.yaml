@@ -5,11 +5,11 @@ required:
 properties:
   current:
     type: number
-    format: float
+    format: float64
     description: Данные о текущей сумме баллов лояльности
     example: 500.5
   withdrawn:
     type: number
-    format: float
+    format: float64
     description: Сумма использованных за весь период регистрации баллов
     example: 42

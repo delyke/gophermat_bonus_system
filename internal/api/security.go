@@ -1,10 +1,11 @@
-package security
+package api
 
 import (
 	"context"
 	"errors"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/ogen-go/ogen/ogenerrors"
 
 	"github.com/delyke/gophermat_bonus_system/internal/authctx"
@@ -28,7 +29,6 @@ func (s *SecurityHandler) HandleJwtCookieAuth(
 	operationName bonusV1.OperationName,
 	t bonusV1.JwtCookieAuth,
 ) (context.Context, error) {
-
 	tokenStr := t.APIKey
 	if tokenStr == "" {
 		return ctx, ogenerrors.ErrSecurityRequirementIsNotSatisfied
@@ -65,8 +65,13 @@ func (s *SecurityHandler) validateHS256(tokenStr string) (authctx.Principal, err
 		return authctx.Principal{}, errors.New("missing sub")
 	}
 
+	userUuid, err := uuid.Parse(sub)
+	if err != nil {
+		return authctx.Principal{}, errors.New("invalid sub")
+	}
+
 	return authctx.Principal{
-		UserUUID: sub,
+		UserUUID: userUuid,
 		Login:    login,
 	}, nil
 }

@@ -1,13 +1,17 @@
 package authctx
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 // Уникальный тип-ключ
 type key struct{}
 
 // Principal - identity пользователя после успешной аутентификации
 type Principal struct {
-	UserUUID string
+	UserUUID uuid.UUID
 	Login    string
 }
 

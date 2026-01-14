@@ -3,17 +3,19 @@ package app
 import (
 	"context"
 	"errors"
-	"github.com/delyke/gophermat_bonus_system/internal/closer"
-	"github.com/delyke/gophermat_bonus_system/internal/config"
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
-	"github.com/delyke/gophermat_bonus_system/internal/migrator"
+	"net/http"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
-	"net/http"
-	"time"
+
+	"github.com/delyke/gophermat_bonus_system/internal/closer"
+	"github.com/delyke/gophermat_bonus_system/internal/config"
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
+	"github.com/delyke/gophermat_bonus_system/internal/migrator"
 )
 
 type App struct {

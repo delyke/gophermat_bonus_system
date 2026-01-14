@@ -1,9 +1,11 @@
 package env
 
 import (
-	"github.com/caarlos0/env/v11"
-	"github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 	"time"
+
+	"github.com/caarlos0/env/v11"
+
+	"github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 )
 
 type jwtEnvConfig struct {

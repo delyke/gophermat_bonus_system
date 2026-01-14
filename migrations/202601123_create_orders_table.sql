@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS orders(
     uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id VARCHAR(64) NOT NULL,
     order_status order_status NOT NULL,
-    accrual NUMERIC(14,2) NOT NULL,
+    accrual NUMERIC(14,2) NULL,
     user_uuid UUID NOT NULL,
     uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
 

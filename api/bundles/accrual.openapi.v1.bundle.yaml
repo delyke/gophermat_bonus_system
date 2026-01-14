@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  title: Accrual API
+  version: 1.0.0
+  description: Система расчета начислнеий баллов лояльности
+paths:
+  /api/orders/{number}:
+    parameters:
+      - $ref: '#/components/parameters/order_number'
+    get:
+      summary: Получение информации о расчете начислений баллов лояльности
+      operationId: GetOrderInfo
+      responses:
+        '200':
+          description: Успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get_order_info_response'
+        '204':
+          description: Заказ не зарегистрирован в системе расчета
+        '429':
+          description: Превышено количество запросов к сервису
+          headers:
+            Retry-After:
+              description: |
+                Количество секунд для ожидания перед выполнением запроса
+              schema:
+                type: integer
+                minimum: 1
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: No more than N requests per minute allowed
+        '500':
+          description: Внутренняя ошибка сервера
+components:
+  parameters:
+    order_number:
+      name: number
+      in: path
+      required: true
+      description: Номер заказа, для которого запрашиваются данные о начислении бонусных баллов
+      schema:
+        type: string
+        example: '2377225624'
+  schemas:
+    order_status:
+      type: string
+      description: Статус расчета начисления
+      enum:
+        - REGISTERED
+        - INVALID
+        - PROCESSING
+        - PROCESSED
+      example: REGISTERED
+    get_order_info_response:
+      type: object
+      required:
+        - order
+        - status
+      properties:
+        order:
+          type: string
+          description: Номер заказа
+          format: digits only
+          example: '2377225624'
+        status:
+          $ref: '#/components/schemas/order_status'
+        accrual:
+          type: number
+          description: Рассчитанные баллы к начислению, при отсутствии начисления - поле отсутствует в ответе
+          format: float
+          example: 500.1
+x-ogen:
+  target: ./pkg/openapi/accrual/v1
+  package: accrual_v1
+  clean: true

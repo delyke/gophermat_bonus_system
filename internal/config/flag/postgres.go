@@ -2,6 +2,7 @@ package flag
 
 import (
 	"fmt"
+
 	"github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 )
 
@@ -20,7 +21,6 @@ type postgresConfig struct {
 }
 
 func NewPostgresConfig() (*postgresConfig, error) {
-
 	var raw postgresFlagConfig
 	flagWasSet := false
 
@@ -65,6 +65,7 @@ func NewPostgresConfig() (*postgresConfig, error) {
 
 	return &postgresConfig{raw: raw}, nil
 }
+
 func (c *postgresConfig) Host() string {
 	if c == nil || c.raw.Host == nil {
 		return defaults.PgHost

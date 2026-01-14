@@ -2,15 +2,16 @@ package user
 
 import (
 	"context"
-	"errors"
+
 	sq "github.com/Masterminds/squirrel"
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+
 	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
+	"github.com/delyke/gophermat_bonus_system/internal/postgres"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
 	repoModel "github.com/delyke/gophermat_bonus_system/internal/repository/model"
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgconn"
-	"go.uber.org/zap"
 )
 
 func (repo *repository) Create(ctx context.Context, login, password string) (*model.User, error) {
@@ -34,7 +35,7 @@ func (repo *repository) Create(ctx context.Context, login, password string) (*mo
 
 	err = repo.pool.QueryRow(ctx, query, args...).Scan(&cUuid, &cLogin, &cPassword, &cBalance)
 	if err != nil {
-		if isUniqueViolation(err) {
+		if postgres.IsUniqueViolation(err) {
 			return nil, model.ErrLoginTaken
 		}
 		logger.Error(ctx, "[REGISTRATION] Failed to create user:", zap.Error(err))
@@ -49,12 +50,4 @@ func (repo *repository) Create(ctx context.Context, login, password string) (*mo
 	}
 
 	return converter.RepoUserToService(insertedUser), nil
-}
-
-func isUniqueViolation(err error) bool {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) {
-		return pgErr.Code == "23505"
-	}
-	return false
 }

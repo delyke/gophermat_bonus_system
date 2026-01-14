@@ -2,6 +2,7 @@ type: object
 required:
   - order
   - sum
+  - processed_at
 properties:
   order:
     type: string
@@ -10,7 +11,7 @@ properties:
     example: "2377225624"
   sum:
     type: number
-    format: float
+    format: float64
     description: Сумма вывода
     example: 500
   processed_at:

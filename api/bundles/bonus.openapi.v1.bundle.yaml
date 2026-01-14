@@ -293,7 +293,7 @@ components:
           $ref: '#/components/schemas/order_status'
         accrual:
           type: number
-          format: float
+          format: float64
           description: Сумма начисления
           example: 500.5
         uploaded_at:
@@ -318,12 +318,12 @@ components:
       properties:
         current:
           type: number
-          format: float
+          format: float64
           description: Данные о текущей сумме баллов лояльности
           example: 500.5
         withdrawn:
           type: number
-          format: float
+          format: float64
           description: Сумма использованных за весь период регистрации баллов
           example: 42
     balance_withdrawal_request:
@@ -339,13 +339,14 @@ components:
           example: '2377225624'
         sum:
           type: number
-          format: float
+          format: float64
           description: Сумма баллов к списанию в счет оплаты
     withdrawal_dto:
       type: object
       required:
         - order
         - sum
+        - processed_at
       properties:
         order:
           type: string
@@ -354,7 +355,7 @@ components:
           example: '2377225624'
         sum:
           type: number
-          format: float
+          format: float64
           description: Сумма вывода
           example: 500
         processed_at:

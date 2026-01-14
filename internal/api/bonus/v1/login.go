@@ -2,9 +2,11 @@ package v1
 
 import (
 	"context"
+
+	"github.com/go-faster/errors"
+
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
-	"github.com/go-faster/errors"
 )
 
 func (a *api) LoginUser(ctx context.Context, req *bonusV1.LoginRequest) (bonusV1.LoginUserRes, error) {

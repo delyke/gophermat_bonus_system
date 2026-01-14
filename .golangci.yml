@@ -53,6 +53,12 @@ linters: # Список активных и отключённых линтер�
           - cyclop     # Не проверять сложность тестов
           - dupl       # Не проверять дублирование в тестах
           - gosec      # Не искать уязвимости в тестах
+      - path: "internal/config/flag/bonus_http.go" #для конфига bonus http flags
+        linters:
+          - dupl
+      - path: "internal/config/flag/jwt.go" #для конфига jwt flags
+        linters:
+          - dupl
     paths:
       - '^pkg/openapi/.*_gen\.go$'
 

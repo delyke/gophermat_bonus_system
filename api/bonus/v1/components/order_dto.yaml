@@ -13,7 +13,7 @@ properties:
     $ref: "./enums/order_status.yaml"
   accrual:
     type: number
-    format: float
+    format: float64
     description: Сумма начисления
     example: 500.5
   uploaded_at:

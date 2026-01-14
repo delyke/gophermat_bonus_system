@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )

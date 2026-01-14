@@ -24,6 +24,10 @@ vars:
 
   OPEN_API_BONUS_V1_BASE: '{{.ROOT_DIR}}/api/bonus/v1/bonus.openapi.yaml'
   OPEN_API_BONUS_V1_BUNDLE: '{{.ROOT_DIR}}/api/bundles/bonus.openapi.v1.bundle.yaml'
+
+  OPEN_API_ACCRUAL_V1_BASE: '{{.ROOT_DIR}}/api/accrual/v1/accrual.openapi.yaml'
+  OPEN_API_ACCRUAL_V1_BUNDLE: '{{.ROOT_DIR}}/api/bundles/accrual.openapi.v1.bundle.yaml'
+
   OPEN_API_FILES: '{{.ROOT_DIR}}/api/bundles'
 
   SERVICES: bonus,accrual
@@ -86,16 +90,23 @@ tasks:
         }
 
   redocly-cli:bonus-v1-bundle:
-    desc: Собрать OpenAPI в один файл через локальный redocly
+    desc: Собрать OpenAPI Bonus в один файл через локальный redocly
     deps: [ redocly-cli:install ]
     cmds:
       - '{{.REDOCLY}} bundle {{.OPEN_API_BONUS_V1_BASE}} -o {{.OPEN_API_BONUS_V1_BUNDLE}}'
+
+  redocly-cli:accrual-v1-bundle:
+    desc: Собрать OpenAPI Accrual в один файл через локальный redocly
+    deps: [ redocly-cli:install ]
+    cmds:
+      - '{{.REDOCLY}} bundle {{.OPEN_API_ACCRUAL_V1_BASE}} -o {{.OPEN_API_ACCRUAL_V1_BUNDLE}}'
 
   redocly-cli:bundle:
     desc: Собрать все схемы OpenAPI в общие файлы через локальный redocly
     deps: [ redocly-cli:install ]
     cmds:
       - task: redocly-cli:bonus-v1-bundle
+      - task: redocly-cli:accrual-v1-bundle
 
   ogen:install:
     desc: "Скачивает ogen в папку bin"

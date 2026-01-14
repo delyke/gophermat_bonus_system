@@ -3,6 +3,10 @@ package app
 import (
 	"context"
 	"fmt"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	security "github.com/delyke/gophermat_bonus_system/internal/api"
 	bonusV1Api "github.com/delyke/gophermat_bonus_system/internal/api/bonus/v1"
 	"github.com/delyke/gophermat_bonus_system/internal/closer"
 	"github.com/delyke/gophermat_bonus_system/internal/config"
@@ -11,9 +15,7 @@ import (
 	"github.com/delyke/gophermat_bonus_system/internal/service"
 	bonusService "github.com/delyke/gophermat_bonus_system/internal/service/bonus"
 	tokenIssuer "github.com/delyke/gophermat_bonus_system/internal/service/bonus/user/jwt"
-	security "github.com/delyke/gophermat_bonus_system/internal/transport/http"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type diContainer struct {

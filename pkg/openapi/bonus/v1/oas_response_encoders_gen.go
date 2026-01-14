@@ -332,5 +332,4 @@ func encodeErrorResponse(response *GenericErrorStatusCode, w http.ResponseWriter
 		return errors.Wrapf(ht.ErrInternalServerErrorResponse, "code: %d, message: %s", code, http.StatusText(code))
 	}
 	return nil
-
 }

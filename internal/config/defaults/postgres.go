@@ -31,24 +31,31 @@ func NewPostgresDefaultConfig() *postgresConfig {
 func (cd *postgresConfig) Host() string {
 	return cd.raw.Host
 }
+
 func (cd *postgresConfig) Port() int {
 	return cd.raw.Port
 }
+
 func (cd *postgresConfig) User() string {
 	return cd.raw.User
 }
+
 func (cd *postgresConfig) Password() string {
 	return cd.raw.Password
 }
+
 func (cd *postgresConfig) Database() string {
 	return cd.raw.Database
 }
+
 func (cd *postgresConfig) DatabaseURI() string {
 	return cd.raw.DatabaseURI
 }
+
 func (cd *postgresConfig) MigrationDirectory() string {
 	return cd.raw.MigrationDirectory
 }
+
 func (cd *postgresConfig) URI() string {
 	if cd.DatabaseURI() != "" {
 		return cd.DatabaseURI()
