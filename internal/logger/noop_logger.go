@@ -11,3 +11,4 @@ type NoopLogger struct{}
 
 func (l *NoopLogger) Info(ctx context.Context, msg string, fields ...zap.Field)  {}
 func (l *NoopLogger) Error(ctx context.Context, msg string, fields ...zap.Field) {}
+func (l *NoopLogger) Debug(ctx context.Context, msg string, fields ...zap.Field) {}

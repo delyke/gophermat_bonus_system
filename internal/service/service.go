@@ -21,7 +21,6 @@ type UserService interface {
 
 type OrderService interface {
 	Create(ctx context.Context, orderID []byte) (string, error)
-	GetByNumber(ctx context.Context, number string) (*model.Order, error)
 	ListByUploadedDesc(ctx context.Context) ([]*model.Order, error)
 }
 
