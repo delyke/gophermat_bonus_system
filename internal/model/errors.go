@@ -30,6 +30,6 @@ var (
 	ErrOrderBelongsToAnotherUser = errors.New("order belongs to another user")
 	// ErrOrderAlreadyUploaded - заказ с таким номером уже был загружен этим пользоваетем
 	ErrOrderAlreadyUploaded = errors.New("order already uploaded")
-	// ErrOrderListEmpty - запрашиваемых заказов не найдено
-	ErrOrderListEmpty = errors.New("order list empty")
+	// ErrOrderNotFound - заказ не найден
+	ErrOrderNotFound = errors.New("order not found")
 )

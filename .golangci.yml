@@ -59,6 +59,18 @@ linters: # Список активных и отключённых линтер�
       - path: "internal/config/flag/jwt.go" #для конфига jwt flags
         linters:
           - dupl
+      - path: "internal/config/flag/accrual.go" #для конфига env flags
+        linters:
+          - dupl
+      - path: "internal/config/flag/logger.go" #для конфига logger flags
+        linters:
+          - dupl
+      - path: "internal/config/env/logger.go" #для конфига logger env
+        linters:
+          - dupl
+      - path: "internal/config/env/accrual.go" #для конфига accrual env
+        linters:
+          - dupl
     paths:
       - '^pkg/openapi/.*_gen\.go$'
 

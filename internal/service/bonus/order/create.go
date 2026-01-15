@@ -54,5 +54,13 @@ func (s *service) Create(ctx context.Context, orderID []byte) (string, error) {
 		}
 	}
 
+	s.accrualWorker.Enqueue(model.OrderJob{
+		OrderUUID:   cOrder.UUID,
+		OrderNumber: cOrder.OrderID,
+		UserID:      cOrder.UserUUID,
+		OrderStatus: cOrder.Status,
+		Attempts:    0,
+	})
+
 	return cOrder.UUID.String(), nil
 }

@@ -40,6 +40,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initLogger,
 		a.initMigrator,
 		a.initCloser,
+		a.initWorkers,
 		a.initRouter,
 		a.initServer,
 	}
@@ -70,12 +71,12 @@ func (a *App) initCloser(_ context.Context) error {
 }
 
 func (a *App) initMigrator(ctx context.Context) error {
-	poolcfg, err := pgxpool.ParseConfig(config.Get().Postgres.URI())
+	poolCfg, err := pgxpool.ParseConfig(config.Get().Postgres.URI())
 	if err != nil {
 		return err
 	}
 
-	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*poolcfg.ConnConfig), config.Get().Postgres.MigrationDirectory())
+	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*poolCfg.ConnConfig), config.Get().Postgres.MigrationDirectory())
 	err = migratorRunner.Up(ctx)
 	if err != nil {
 		return err
@@ -101,6 +102,15 @@ func (a *App) initServer(_ context.Context) error {
 		ReadHeaderTimeout: config.Get().HTTP.ReadTimeout(),
 	}
 	a.httpServer = server
+	return nil
+}
+
+func (a *App) initWorkers(ctx context.Context) error {
+	p := a.diContainer.AccrualWorker(ctx)
+
+	if err := p.Bootstrap(ctx); err != nil {
+		return err
+	}
 	return nil
 }
 

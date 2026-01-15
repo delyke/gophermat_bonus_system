@@ -4,6 +4,7 @@ import "github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 
 type accrualEnvConfig struct {
 	SystemAddress *string
+	WorkersCount  *int
 }
 
 type accrualConfig struct {
@@ -19,6 +20,11 @@ func NewAccrualConfig() (*accrualConfig, error) {
 		flagWasSet = true
 	}
 
+	if WasSet("w") {
+		raw.WorkersCount = accrualWorkersCount
+		flagWasSet = true
+	}
+
 	if !flagWasSet {
 		return nil, nil
 	}
@@ -30,4 +36,11 @@ func (ac *accrualConfig) SystemAddress() string {
 		return defaults.AccrualSystemAddress
 	}
 	return *ac.raw.SystemAddress
+}
+
+func (ac *accrualConfig) WorkersCount() int {
+	if ac == nil && ac.raw.WorkersCount == nil {
+		return defaults.AccrualWorkersCount
+	}
+	return *ac.raw.WorkersCount
 }

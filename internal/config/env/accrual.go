@@ -9,6 +9,7 @@ import (
 // accrualEnvConfig — raw-структура для env.
 type accrualEnvConfig struct {
 	SystemAddress *string `env:"ACCRUAL_SYSTEM_ADDRESS"`
+	WorkersCount  *int    `env:"ACCRUAL_WORKERS_COUNT"`
 }
 
 // accrualConfig — публичный конфиг слоя env
@@ -29,7 +30,7 @@ func NewAccrualConfig() (*accrualConfig, error) {
 	}
 
 	// Если env ничего не задал — считаем конфиг отсутствующим
-	if raw.SystemAddress == nil {
+	if raw.SystemAddress == nil && raw.WorkersCount == nil {
 		return nil, nil
 	}
 
@@ -42,4 +43,11 @@ func (ac *accrualConfig) SystemAddress() string {
 		return defaults.AccrualSystemAddress
 	}
 	return *ac.raw.SystemAddress
+}
+
+func (ac *accrualConfig) WorkersCount() int {
+	if ac == nil || ac.raw.WorkersCount == nil {
+		return defaults.AccrualWorkersCount
+	}
+	return *ac.raw.WorkersCount
 }

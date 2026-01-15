@@ -25,6 +25,7 @@ type BonusHTTPConfig interface {
 
 type AccrualConfig interface {
 	SystemAddress() string
+	WorkersCount() int
 }
 
 type JWTConfig interface {

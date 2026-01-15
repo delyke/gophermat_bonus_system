@@ -19,6 +19,9 @@ type OrderRepository interface {
 	Create(ctx context.Context, order *model.Order) (*model.Order, error)
 	GetByNumber(ctx context.Context, number string) (*model.Order, error)
 	GetListByUploadedDesc(ctx context.Context, userUUID uuid.UUID) ([]*model.Order, error)
+	SetStatusByUUID(ctx context.Context, uuid uuid.UUID, status model.OrderStatus) error
+	SetAccrualByUUID(ctx context.Context, uuid uuid.UUID, accrual float64) error
+	ListPending(ctx context.Context, limit uint64) ([]*model.Order, error)
 }
 
 type WithdrawalRepository interface {

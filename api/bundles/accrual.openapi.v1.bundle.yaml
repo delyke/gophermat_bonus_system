@@ -71,7 +71,7 @@ components:
         accrual:
           type: number
           description: Рассчитанные баллы к начислению, при отсутствии начисления - поле отсутствует в ответе
-          format: float
+          format: float64
           example: 500.1
 x-ogen:
   target: ./pkg/openapi/accrual/v1

@@ -8,7 +8,8 @@ var (
 
 // Accrual flags
 var (
-	systemAddress = FS.String("r", "", "Accrual System address")
+	systemAddress       = FS.String("r", "", "Accrual System address")
+	accrualWorkersCount = FS.Int("w", 0, "Accrual workers count")
 )
 
 // Bonus HTTP flags

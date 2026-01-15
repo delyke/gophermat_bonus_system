@@ -15,6 +15,8 @@ import (
 	"github.com/delyke/gophermat_bonus_system/internal/service"
 	bonusService "github.com/delyke/gophermat_bonus_system/internal/service/bonus"
 	tokenIssuer "github.com/delyke/gophermat_bonus_system/internal/service/bonus/user/jwt"
+	"github.com/delyke/gophermat_bonus_system/internal/service/workers"
+	accrualV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/accrual/v1"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
@@ -27,10 +29,41 @@ type diContainer struct {
 	bonusRepository repository.BonusRepository
 	sec             *security.SecurityHandler
 	tokenIssuer     service.TokenIssuer
+	accrualClient   *accrualV1.Client
+	accrualWorker   workers.AccrualWorker
 }
 
 func NewDIContainer() *diContainer {
 	return &diContainer{}
+}
+
+func (di *diContainer) AccrualWorker(ctx context.Context) workers.AccrualWorker {
+	if di.accrualWorker == nil {
+		p := workers.NewAccrualProcessor(
+			ctx,
+			di.BonusRepository(ctx),
+			di.AccrualClient(ctx), config.Get().Accrual.WorkersCount(),
+		)
+
+		closer.AddNamed("Accrual Worker", func(ctx context.Context) error {
+			p.Stop()
+			return nil
+		})
+
+		di.accrualWorker = p
+	}
+	return di.accrualWorker
+}
+
+func (di *diContainer) AccrualClient(_ context.Context) *accrualV1.Client {
+	if di.accrualClient == nil {
+		client, err := accrualV1.NewClient(config.Get().Accrual.SystemAddress())
+		if err != nil {
+			return nil
+		}
+		di.accrualClient = client
+	}
+	return di.accrualClient
 }
 
 func (di *diContainer) TokenIssuer() service.TokenIssuer {
@@ -67,7 +100,7 @@ func (di *diContainer) BonusV1Api(ctx context.Context) bonusV1.Handler {
 
 func (di *diContainer) BonusService(ctx context.Context) service.BonusService {
 	if di.bonusService == nil {
-		di.bonusService = bonusService.NewService(di.BonusRepository(ctx), di.TokenIssuer())
+		di.bonusService = bonusService.NewService(di.BonusRepository(ctx), di.TokenIssuer(), di.AccrualWorker(ctx))
 	}
 	return di.bonusService
 }

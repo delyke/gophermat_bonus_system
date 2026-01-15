@@ -8,7 +8,8 @@ var (
 
 // Accrual defaults
 var (
-	AccrualSystemAddress = "localhost:8081"
+	AccrualSystemAddress = "http://localhost:8081"
+	AccrualWorkersCount  = 4
 )
 
 // Bonus HTTP defaults

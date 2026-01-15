@@ -6,7 +6,7 @@ import (
 
 	"github.com/samber/lo"
 
-	"github.com/delyke/gophermat_bonus_system/internal/api/converter"
+	"github.com/delyke/gophermat_bonus_system/internal/api/bonus/converter"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )

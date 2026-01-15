@@ -25,7 +25,7 @@ type GetOrderInfoResponse struct {
 	Status OrderStatus `json:"status"`
 	// Рассчитанные баллы к начислению, при отсутствии
 	// начисления - поле отсутствует в ответе.
-	Accrual OptFloat32 `json:"accrual"`
+	Accrual OptFloat64 `json:"accrual"`
 }
 
 // GetOrder returns the value of Order.
@@ -39,7 +39,7 @@ func (s *GetOrderInfoResponse) GetStatus() OrderStatus {
 }
 
 // GetAccrual returns the value of Accrual.
-func (s *GetOrderInfoResponse) GetAccrual() OptFloat32 {
+func (s *GetOrderInfoResponse) GetAccrual() OptFloat64 {
 	return s.Accrual
 }
 
@@ -54,7 +54,7 @@ func (s *GetOrderInfoResponse) SetStatus(val OrderStatus) {
 }
 
 // SetAccrual sets the value of Accrual.
-func (s *GetOrderInfoResponse) SetAccrual(val OptFloat32) {
+func (s *GetOrderInfoResponse) SetAccrual(val OptFloat64) {
 	s.Accrual = val
 }
 
@@ -102,38 +102,38 @@ func (s *GetOrderInfoTooManyRequestsHeaders) SetResponse(val GetOrderInfoTooMany
 
 func (*GetOrderInfoTooManyRequestsHeaders) getOrderInfoRes() {}
 
-// NewOptFloat32 returns new OptFloat32 with value set to v.
-func NewOptFloat32(v float32) OptFloat32 {
-	return OptFloat32{
+// NewOptFloat64 returns new OptFloat64 with value set to v.
+func NewOptFloat64(v float64) OptFloat64 {
+	return OptFloat64{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptFloat32 is optional float32.
-type OptFloat32 struct {
-	Value float32
+// OptFloat64 is optional float64.
+type OptFloat64 struct {
+	Value float64
 	Set   bool
 }
 
-// IsSet returns true if OptFloat32 was set.
-func (o OptFloat32) IsSet() bool { return o.Set }
+// IsSet returns true if OptFloat64 was set.
+func (o OptFloat64) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptFloat32) Reset() {
-	var v float32
+func (o *OptFloat64) Reset() {
+	var v float64
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptFloat32) SetTo(v float32) {
+func (o *OptFloat64) SetTo(v float64) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptFloat32) Get() (v float32, ok bool) {
+func (o OptFloat64) Get() (v float64, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -141,7 +141,7 @@ func (o OptFloat32) Get() (v float32, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptFloat32) Or(d float32) float32 {
+func (o OptFloat64) Or(d float64) float64 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
