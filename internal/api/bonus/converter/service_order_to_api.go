@@ -9,7 +9,7 @@ func ServiceOrderToApi(serviceOrder model.Order) bonusV1.OrderDto {
 	return bonusV1.OrderDto{
 		Number:     serviceOrder.OrderID,
 		Status:     ServiceOrderStatusToApi(serviceOrder.Status),
-		Accrual:    Float64PtrToOptFloat32(serviceOrder.Accrual),
+		Accrual:    Float64PtrToOptFloat64(serviceOrder.Accrual),
 		UploadedAt: serviceOrder.UploadedAt,
 	}
 }
