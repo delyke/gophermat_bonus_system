@@ -32,14 +32,14 @@ func NewAccrualConfig() (*accrualConfig, error) {
 }
 
 func (ac *accrualConfig) SystemAddress() string {
-	if ac == nil && ac.raw.SystemAddress == nil {
+	if ac == nil || ac.raw.SystemAddress == nil {
 		return defaults.AccrualSystemAddress
 	}
 	return *ac.raw.SystemAddress
 }
 
 func (ac *accrualConfig) WorkersCount() int {
-	if ac == nil && ac.raw.WorkersCount == nil {
+	if ac == nil || ac.raw.WorkersCount == nil {
 		return defaults.AccrualWorkersCount
 	}
 	return *ac.raw.WorkersCount

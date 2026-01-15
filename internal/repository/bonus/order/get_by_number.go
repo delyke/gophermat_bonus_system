@@ -34,20 +34,20 @@ func (repo *repository) GetByNumber(ctx context.Context, number string) (*model.
 
 	var (
 		order       repoModel.Order
-		gUuid       uuid.UUID
-		gOrderId    string
+		gUUID       uuid.UUID
+		gOrderID    string
 		gStatus     repoModel.OrderStatus
 		gAccrual    *float64
 		gUserUUID   uuid.UUID
 		gUploadedAt time.Time
 	)
 
-	err = repo.pool.QueryRow(ctx, query, args...).Scan(&gUuid, &gOrderId, &gStatus, &gAccrual, &gUserUUID, &gUploadedAt)
+	err = repo.pool.QueryRow(ctx, query, args...).Scan(&gUUID, &gOrderID, &gStatus, &gAccrual, &gUserUUID, &gUploadedAt)
 	if err != nil {
 		return nil, err
 	}
-	order.UUID = gUuid
-	order.OrderID = gOrderId
+	order.UUID = gUUID
+	order.OrderID = gOrderID
 	order.Status = gStatus
 	order.Accrual = gAccrual
 	order.UserUUID = gUserUUID

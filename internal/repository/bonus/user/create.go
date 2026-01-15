@@ -27,13 +27,13 @@ func (repo *repository) Create(ctx context.Context, login, password string) (*mo
 	}
 
 	var (
-		cUuid     uuid.UUID
+		cUUID     uuid.UUID
 		cLogin    string
 		cPassword string
 		cBalance  float64
 	)
 
-	err = repo.pool.QueryRow(ctx, query, args...).Scan(&cUuid, &cLogin, &cPassword, &cBalance)
+	err = repo.pool.QueryRow(ctx, query, args...).Scan(&cUUID, &cLogin, &cPassword, &cBalance)
 	if err != nil {
 		if postgres.IsUniqueViolation(err) {
 			return nil, model.ErrLoginTaken
@@ -43,7 +43,7 @@ func (repo *repository) Create(ctx context.Context, login, password string) (*mo
 	}
 
 	insertedUser := &repoModel.User{
-		UUID:     cUuid,
+		UUID:     cUUID,
 		Login:    cLogin,
 		Password: cPassword,
 		Balance:  cBalance,

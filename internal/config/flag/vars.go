@@ -3,7 +3,7 @@ package flag
 // Logger flags
 var (
 	logLevel = FS.String("l", "", "Log level")
-	asJson   = FS.Bool("j", false, "Use JSON log format")
+	asJSON   = FS.Bool("j", false, "Use JSON log format")
 )
 
 // Accrual flags

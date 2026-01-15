@@ -45,8 +45,8 @@ func (repo *repository) ListPending(ctx context.Context, limit uint64) ([]*model
 
 	var (
 		orders       []*repoModel.Order
-		gId          uuid.UUID
-		gOrderId     string
+		gID          uuid.UUID
+		gOrderID     string
 		gOrderStatus repoModel.OrderStatus
 		gAccrual     *float64
 		gUserUUID    uuid.UUID
@@ -54,14 +54,14 @@ func (repo *repository) ListPending(ctx context.Context, limit uint64) ([]*model
 	)
 
 	for rows.Next() {
-		err = rows.Scan(&gId, &gOrderId, &gOrderStatus, &gAccrual, &gUserUUID, &gUploadedAt)
+		err = rows.Scan(&gID, &gOrderID, &gOrderStatus, &gAccrual, &gUserUUID, &gUploadedAt)
 		if err != nil {
 			logger.Error(ctx, "Ошибка при переборке полученных заказов", zap.Error(err))
 			return nil, err
 		}
 		orders = append(orders, &repoModel.Order{
-			UUID:       gId,
-			OrderID:    gOrderId,
+			UUID:       gID,
+			OrderID:    gOrderID,
 			Status:     gOrderStatus,
 			Accrual:    gAccrual,
 			UserUUID:   gUserUUID,

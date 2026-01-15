@@ -42,7 +42,7 @@ func (repo *repository) ListByUserByDateDesc(ctx context.Context, userUUID uuid.
 
 	var (
 		withdrawals  []*repoModel.Withdrawal
-		gId          uuid.UUID
+		gID          uuid.UUID
 		gUserUUID    uuid.UUID
 		gOrderID     string
 		gAmount      float64
@@ -50,13 +50,13 @@ func (repo *repository) ListByUserByDateDesc(ctx context.Context, userUUID uuid.
 	)
 
 	for rows.Next() {
-		err = rows.Scan(&gId, &gUserUUID, &gOrderID, &gAmount, &gProcessedAt)
+		err = rows.Scan(&gID, &gUserUUID, &gOrderID, &gAmount, &gProcessedAt)
 		if err != nil {
 			logger.Error(ctx, "Ошибка при сканировании выданных данных в Repo Withdrawal", zap.Error(err))
 			return nil, err
 		}
 		withdrawals = append(withdrawals, &repoModel.Withdrawal{
-			UUID:        gId,
+			UUID:        gID,
 			UserUUID:    gUserUUID,
 			OrderID:     gOrderID,
 			Amount:      gAmount,

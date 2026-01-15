@@ -30,18 +30,18 @@ func (repo *repository) GetByLogin(ctx context.Context, login string) (*model.Us
 
 	var (
 		user      repoModel.User
-		gUuid     uuid.UUID
+		gUUID     uuid.UUID
 		gLogin    string
 		gPassword string
 		gBalance  float64
 	)
 
-	err = repo.pool.QueryRow(ctx, query, args...).Scan(&gUuid, &gLogin, &gPassword, &gBalance)
+	err = repo.pool.QueryRow(ctx, query, args...).Scan(&gUUID, &gLogin, &gPassword, &gBalance)
 	if err != nil {
 		return nil, err
 	}
 
-	user.UUID = gUuid
+	user.UUID = gUUID
 	user.Login = login
 	user.Password = gPassword
 	user.Balance = gBalance

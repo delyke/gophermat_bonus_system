@@ -288,6 +288,18 @@ func (p *AccrualProcessor) orderProcessedResponseProcessing(ctx context.Context,
 			return
 		}
 	}
+	balance, err := p.repo.Users().GetBalanceByUUID(ctx, j.UserID)
+	if err != nil {
+		logger.Error(ctx, "Ошибка при запросе баланса пользователя", zap.Error(err))
+		return
+	}
+	balance += *accrual
+
+	err = p.repo.Users().SetBalanceByUUID(ctx, j.UserID, balance)
+	if err != nil {
+		logger.Error(ctx, "Ошибка при установке баланса пользователю", zap.Error(err))
+		return
+	}
 }
 
 func jitter(max time.Duration) time.Duration {

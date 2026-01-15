@@ -22,7 +22,7 @@ func NewLoggerConfig() (*loggerConfig, error) {
 	}
 
 	if WasSet("j") {
-		raw.AsJSON = asJson
+		raw.AsJSON = asJSON
 		flagWasSet = true
 	}
 

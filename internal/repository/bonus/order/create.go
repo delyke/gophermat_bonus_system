@@ -30,8 +30,8 @@ func (repo *repository) Create(ctx context.Context, order *model.Order) (*model.
 	}
 
 	var (
-		cUuid       uuid.UUID
-		cOrderId    string
+		cUUID       uuid.UUID
+		cOrderID    string
 		cStatus     repoModel.OrderStatus
 		cAccrual    *float64
 		cUserUUID   uuid.UUID
@@ -39,8 +39,8 @@ func (repo *repository) Create(ctx context.Context, order *model.Order) (*model.
 	)
 
 	err = repo.pool.QueryRow(ctx, query, args...).Scan(
-		&cUuid,
-		&cOrderId,
+		&cUUID,
+		&cOrderID,
 		&cStatus,
 		&cAccrual,
 		&cUserUUID,
@@ -54,8 +54,8 @@ func (repo *repository) Create(ctx context.Context, order *model.Order) (*model.
 		return nil, err
 	}
 
-	repoOrder.UUID = cUuid
-	repoOrder.OrderID = cOrderId
+	repoOrder.UUID = cUUID
+	repoOrder.OrderID = cOrderID
 	repoOrder.Status = cStatus
 	repoOrder.Accrual = cAccrual
 	repoOrder.UserUUID = cUserUUID

@@ -65,13 +65,13 @@ func (s *SecurityHandler) validateHS256(tokenStr string) (authctx.Principal, err
 		return authctx.Principal{}, errors.New("missing sub")
 	}
 
-	userUuid, err := uuid.Parse(sub)
+	userUUID, err := uuid.Parse(sub)
 	if err != nil {
 		return authctx.Principal{}, errors.New("invalid sub")
 	}
 
 	return authctx.Principal{
-		UserUUID: userUuid,
+		UserUUID: userUUID,
 		Login:    login,
 	}, nil
 }
