@@ -10,7 +10,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func (s *ApiSuite) TestGetWithdrawalsUnauthorized() {
+func (s *APISuite) TestGetWithdrawalsUnauthorized() {
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("GetList", s.ctx).Return(nil, model.ErrUnauthorized)
 
@@ -20,7 +20,7 @@ func (s *ApiSuite) TestGetWithdrawalsUnauthorized() {
 	s.Require().IsType(&bonusV1.GetWithdrawalsUnauthorized{}, res)
 }
 
-func (s *ApiSuite) TestGetWithdrawalsInternalServerError() {
+func (s *APISuite) TestGetWithdrawalsInternalServerError() {
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("GetList", s.ctx).Return(nil, errors.New("unexpected error"))
 
@@ -30,7 +30,7 @@ func (s *ApiSuite) TestGetWithdrawalsInternalServerError() {
 	s.Require().IsType(&bonusV1.GetWithdrawalsInternalServerError{}, res)
 }
 
-func (s *ApiSuite) TestGetWithdrawalsNoContent() {
+func (s *APISuite) TestGetWithdrawalsNoContent() {
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("GetList", s.ctx).Return([]*model.Withdrawal{}, nil)
 
@@ -40,7 +40,7 @@ func (s *ApiSuite) TestGetWithdrawalsNoContent() {
 	s.Require().IsType(&bonusV1.GetWithdrawalsNoContent{}, res)
 }
 
-func (s *ApiSuite) TestGetWithdrawalsOK() {
+func (s *APISuite) TestGetWithdrawalsOK() {
 	processedAt := time.Now()
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("GetList", s.ctx).Return([]*model.Withdrawal{

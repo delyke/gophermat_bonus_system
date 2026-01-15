@@ -7,7 +7,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func (s *ApiSuite) TestGetUserBalanceUnauthorized() {
+func (s *APISuite) TestGetUserBalanceUnauthorized() {
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("GetBalance", s.ctx).Return(0.0, 0.0, model.ErrUnauthorized)
 
@@ -17,7 +17,7 @@ func (s *ApiSuite) TestGetUserBalanceUnauthorized() {
 	s.Require().IsType(&bonusV1.GetUserBalanceUnauthorized{}, res)
 }
 
-func (s *ApiSuite) TestGetUserBalanceInternalServerError() {
+func (s *APISuite) TestGetUserBalanceInternalServerError() {
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("GetBalance", s.ctx).Return(0.0, 0.0, errors.New("unexpected error"))
 
@@ -27,7 +27,7 @@ func (s *ApiSuite) TestGetUserBalanceInternalServerError() {
 	s.Require().IsType(&bonusV1.GetUserBalanceInternalServerError{}, res)
 }
 
-func (s *ApiSuite) TestGetUserBalanceOK() {
+func (s *APISuite) TestGetUserBalanceOK() {
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("GetBalance", s.ctx).Return(100.0, 10.0, nil)
 

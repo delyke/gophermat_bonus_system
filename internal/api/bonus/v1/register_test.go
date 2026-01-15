@@ -8,7 +8,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func (s *ApiSuite) TestRegisterUserBadCredentials() {
+func (s *APISuite) TestRegisterUserBadCredentials() {
 	req := &bonusV1.RegisterRequest{Login: "", Password: ""}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Register", s.ctx, "", "").Return("", model.ErrBadCredentials)
@@ -19,7 +19,7 @@ func (s *ApiSuite) TestRegisterUserBadCredentials() {
 	s.Require().IsType(&bonusV1.RegisterUserBadRequest{}, res)
 }
 
-func (s *ApiSuite) TestRegisterUserConflict() {
+func (s *APISuite) TestRegisterUserConflict() {
 	req := &bonusV1.RegisterRequest{Login: "max", Password: "123"}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Register", s.ctx, "max", "123").Return("", model.ErrLoginTaken)
@@ -30,7 +30,7 @@ func (s *ApiSuite) TestRegisterUserConflict() {
 	s.Require().IsType(&bonusV1.RegisterUserConflict{}, res)
 }
 
-func (s *ApiSuite) TestRegisterUserInternalServerError() {
+func (s *APISuite) TestRegisterUserInternalServerError() {
 	req := &bonusV1.RegisterRequest{Login: "max", Password: "123"}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Register", s.ctx, "max", "123").Return("", errors.New("unexpected error"))
@@ -41,7 +41,7 @@ func (s *ApiSuite) TestRegisterUserInternalServerError() {
 	s.Require().IsType(&bonusV1.RegisterUserInternalServerError{}, res)
 }
 
-func (s *ApiSuite) TestRegisterUserOK() {
+func (s *APISuite) TestRegisterUserOK() {
 	req := &bonusV1.RegisterRequest{Login: "max", Password: "123"}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Register", s.ctx, "max", "123").Return("token", nil)

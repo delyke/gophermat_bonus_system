@@ -24,6 +24,6 @@ func (a *api) GetWithdrawals(ctx context.Context) (bonusV1.GetWithdrawalsRes, er
 	if len(withdrawals) == 0 {
 		return &bonusV1.GetWithdrawalsNoContent{}, nil
 	}
-	apiWithdrawals := converter.ServiceWithdrawalListToApi(withdrawals)
+	apiWithdrawals := converter.ServiceWithdrawalListToAPI(withdrawals)
 	return lo.ToPtr(bonusV1.GetWithdrawalsResponse(apiWithdrawals)), nil
 }

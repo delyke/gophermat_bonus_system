@@ -4,7 +4,7 @@ import "github.com/delyke/gophermat_bonus_system/internal/config/defaults"
 
 type loggerEnvConfig struct {
 	Level  *string
-	AsJson *bool
+	AsJSON *bool
 }
 
 type loggerConfig struct {
@@ -22,7 +22,7 @@ func NewLoggerConfig() (*loggerConfig, error) {
 	}
 
 	if WasSet("j") {
-		raw.AsJson = asJson
+		raw.AsJSON = asJson
 		flagWasSet = true
 	}
 
@@ -40,9 +40,9 @@ func (cfg *loggerConfig) Level() string {
 	return *cfg.raw.Level
 }
 
-func (cfg *loggerConfig) AsJson() bool {
-	if cfg == nil || cfg.raw.AsJson == nil {
-		return defaults.LoggerAsJson
+func (cfg *loggerConfig) AsJSON() bool {
+	if cfg == nil || cfg.raw.AsJSON == nil {
+		return defaults.LoggerAsJSON
 	}
-	return *cfg.raw.AsJson
+	return *cfg.raw.AsJSON
 }

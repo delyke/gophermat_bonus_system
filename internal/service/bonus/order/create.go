@@ -22,7 +22,7 @@ func (s *service) Create(ctx context.Context, orderID []byte) (string, error) {
 	}
 	if !isValid {
 		logger.Debug(ctx, "номер заказа не валидный", zap.String("orderId", string(orderID)))
-		return "", model.ErrOrderIdLuhnInvalid
+		return "", model.ErrOrderIDLuhnInvalid
 	}
 
 	principal, ok := authctx.PrincipalFrom(ctx)
@@ -40,7 +40,7 @@ func (s *service) Create(ctx context.Context, orderID []byte) (string, error) {
 	cOrder, err := s.bonusRepository.Orders().Create(ctx, order)
 	if err != nil {
 		switch {
-		case errors.Is(err, model.ErrOrderIdAlreadyExists):
+		case errors.Is(err, model.ErrOrderIDAlreadyExists):
 			cOrder, err = s.bonusRepository.Orders().GetByNumber(ctx, string(orderID))
 			if err != nil {
 				return "", err

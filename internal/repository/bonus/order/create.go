@@ -48,7 +48,7 @@ func (repo *repository) Create(ctx context.Context, order *model.Order) (*model.
 	)
 	if err != nil {
 		if postgres.IsUniqueViolation(err) {
-			return nil, model.ErrOrderIdAlreadyExists
+			return nil, model.ErrOrderIDAlreadyExists
 		}
 		logger.Error(ctx, "[ORDER CREATE] Failed to create order:", zap.Error(err))
 		return nil, err

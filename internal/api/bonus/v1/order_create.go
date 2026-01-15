@@ -30,7 +30,7 @@ func (a *api) OrderNumberLoad(ctx context.Context, req bonusV1.OrderNumberLoadRe
 		switch {
 		case errors.Is(err, model.ErrBadCredentials):
 			return &bonusV1.OrderNumberLoadBadRequest{}, nil
-		case errors.Is(err, model.ErrOrderIdLuhnInvalid):
+		case errors.Is(err, model.ErrOrderIDLuhnInvalid):
 			return &bonusV1.OrderNumberLoadUnprocessableEntity{}, nil
 		case errors.Is(err, model.ErrUnauthorized):
 			return &bonusV1.OrderNumberLoadUnauthorized{}, nil

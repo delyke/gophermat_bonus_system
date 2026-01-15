@@ -24,7 +24,7 @@ func (s *service) Create(ctx context.Context, orderID []byte, sum float64) error
 	}
 	if !isValid {
 		logger.Debug(ctx, "номер заказа не валидный", zap.String("orderId", string(orderID)))
-		return model.ErrOrderIdLuhnInvalid
+		return model.ErrOrderIDLuhnInvalid
 	}
 
 	cBalance, err := s.bonusRepository.Users().GetBalanceByUUID(ctx, principal.UserUUID)

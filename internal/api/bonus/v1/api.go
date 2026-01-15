@@ -18,7 +18,7 @@ type api struct {
 	bonusService service.BonusService
 }
 
-func NewApi(bs service.BonusService) *api {
+func NewAPI(bs service.BonusService) *api {
 	return &api{bonusService: bs}
 }
 

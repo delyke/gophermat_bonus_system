@@ -8,7 +8,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func (s *ApiSuite) TestGetOrdersNumberListInternalServerError() {
+func (s *APISuite) TestGetOrdersNumberListInternalServerError() {
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("ListByUploadedDesc", s.ctx).Return(nil, errors.New("unexpected error"))
 
@@ -18,7 +18,7 @@ func (s *ApiSuite) TestGetOrdersNumberListInternalServerError() {
 	s.Require().IsType(&bonusV1.GetOrdersNumberListInternalServerError{}, res)
 }
 
-func (s *ApiSuite) TestGetOrdersNumberListNoContent() {
+func (s *APISuite) TestGetOrdersNumberListNoContent() {
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("ListByUploadedDesc", s.ctx).Return([]*model.Order{}, nil)
 
@@ -28,7 +28,7 @@ func (s *ApiSuite) TestGetOrdersNumberListNoContent() {
 	s.Require().IsType(&bonusV1.GetOrdersNumberListNoContent{}, res)
 }
 
-func (s *ApiSuite) TestGetOrdersNumberListOK() {
+func (s *APISuite) TestGetOrdersNumberListOK() {
 	uploadedAt := time.Now()
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("ListByUploadedDesc", s.ctx).Return([]*model.Order{

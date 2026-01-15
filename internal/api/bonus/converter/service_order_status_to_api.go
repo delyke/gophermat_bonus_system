@@ -5,7 +5,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func ServiceOrderStatusToApi(status model.OrderStatus) bonusV1.OrderStatus {
+func ServiceOrderStatusToAPI(status model.OrderStatus) bonusV1.OrderStatus {
 	switch status {
 	case model.OrderNew:
 		return bonusV1.OrderStatusNEW

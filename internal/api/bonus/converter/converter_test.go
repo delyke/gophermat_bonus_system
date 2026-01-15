@@ -21,11 +21,11 @@ func TestFloat64PtrToOptFloat64(t *testing.T) {
 }
 
 func TestServiceOrderStatusToApi(t *testing.T) {
-	require.Equal(t, bonusV1.OrderStatusNEW, ServiceOrderStatusToApi(model.OrderNew))
-	require.Equal(t, bonusV1.OrderStatusPROCESSING, ServiceOrderStatusToApi(model.OrderProcessing))
-	require.Equal(t, bonusV1.OrderStatusINVALID, ServiceOrderStatusToApi(model.OrderInvalid))
-	require.Equal(t, bonusV1.OrderStatusPROCESSED, ServiceOrderStatusToApi(model.OrderProcessed))
-	require.Equal(t, bonusV1.OrderStatusINVALID, ServiceOrderStatusToApi(model.OrderStatus("unknown")))
+	require.Equal(t, bonusV1.OrderStatusNEW, ServiceOrderStatusToAPI(model.OrderNew))
+	require.Equal(t, bonusV1.OrderStatusPROCESSING, ServiceOrderStatusToAPI(model.OrderProcessing))
+	require.Equal(t, bonusV1.OrderStatusINVALID, ServiceOrderStatusToAPI(model.OrderInvalid))
+	require.Equal(t, bonusV1.OrderStatusPROCESSED, ServiceOrderStatusToAPI(model.OrderProcessed))
+	require.Equal(t, bonusV1.OrderStatusINVALID, ServiceOrderStatusToAPI(model.OrderStatus("unknown")))
 }
 
 func TestServiceOrderToApi(t *testing.T) {
@@ -38,7 +38,7 @@ func TestServiceOrderToApi(t *testing.T) {
 		UploadedAt: now,
 	}
 
-	result := ServiceOrderToApi(order)
+	result := ServiceOrderToAPI(order)
 
 	require.Equal(t, "20000006", result.Number)
 	require.Equal(t, bonusV1.OrderStatusPROCESSED, result.Status)
@@ -57,7 +57,7 @@ func TestServiceOrdersListToApi(t *testing.T) {
 		},
 	}
 
-	result := ServiceOrdersListToApi(orders)
+	result := ServiceOrdersListToAPI(orders)
 
 	require.Len(t, result, 1)
 	require.Equal(t, "20000006", result[0].Number)
@@ -73,7 +73,7 @@ func TestServiceWithdrawalToApi(t *testing.T) {
 		ProcessedAt: now,
 	}
 
-	result := ServiceWithdrawalToApi(withdrawal)
+	result := ServiceWithdrawalToAPI(withdrawal)
 
 	require.Equal(t, "20000006", result.Order)
 	require.Equal(t, 5.5, result.Sum)
@@ -90,7 +90,7 @@ func TestServiceWithdrawalListToApi(t *testing.T) {
 		},
 	}
 
-	result := ServiceWithdrawalListToApi(withdrawals)
+	result := ServiceWithdrawalListToAPI(withdrawals)
 
 	require.Len(t, result, 1)
 	require.Equal(t, "20000006", result[0].Order)

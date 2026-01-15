@@ -19,7 +19,7 @@ func (s *ServiceSuite) TestCreateLuhnValidateError() {
 func (s *ServiceSuite) TestCreateLuhnValidateNumberError() {
 	_, err := s.service.Create(s.ctx, []byte("495599"))
 	s.Require().Error(err)
-	s.Require().ErrorIs(err, model.ErrOrderIdLuhnInvalid)
+	s.Require().ErrorIs(err, model.ErrOrderIDLuhnInvalid)
 }
 
 func (s *ServiceSuite) TestCreateUUIDFromContextFailure() {
@@ -35,7 +35,7 @@ func (s *ServiceSuite) TestCreateOrderExistsOnCurrentUser() {
 		Login:    "max",
 	})
 	s.bonusRepository.On("Orders").Return(s.orderRepository)
-	s.orderRepository.On("Create", s.ctx, mock.Anything).Return(nil, model.ErrOrderIdAlreadyExists)
+	s.orderRepository.On("Create", s.ctx, mock.Anything).Return(nil, model.ErrOrderIDAlreadyExists)
 	s.orderRepository.On("GetByNumber", s.ctx, "20000006").Return(&model.Order{
 		UserUUID: userID,
 	}, nil)
@@ -67,7 +67,7 @@ func (s *ServiceSuite) TestCreateOrderExistsOnAnotherUser() {
 		Login:    "max",
 	})
 	s.bonusRepository.On("Orders").Return(s.orderRepository)
-	s.orderRepository.On("Create", s.ctx, mock.Anything).Return(nil, model.ErrOrderIdAlreadyExists)
+	s.orderRepository.On("Create", s.ctx, mock.Anything).Return(nil, model.ErrOrderIDAlreadyExists)
 	s.orderRepository.On("GetByNumber", s.ctx, "20000006").Return(&model.Order{
 		UserUUID: uuid.New(),
 	}, nil)
@@ -84,7 +84,7 @@ func (s *ServiceSuite) TestCreateOrderGetByIdUnexpected() {
 		Login:    "max",
 	})
 	s.bonusRepository.On("Orders").Return(s.orderRepository)
-	s.orderRepository.On("Create", s.ctx, mock.Anything).Return(nil, model.ErrOrderIdAlreadyExists)
+	s.orderRepository.On("Create", s.ctx, mock.Anything).Return(nil, model.ErrOrderIDAlreadyExists)
 	gByNumErr := errors.New("unexpected error")
 	s.orderRepository.On("GetByNumber", s.ctx, "20000006").Return(nil, gByNumErr)
 	_, err := s.service.Create(s.ctx, []byte("20000006"))
@@ -105,8 +105,8 @@ func (s *ServiceSuite) TestCreateOrderSuccess() {
 		UUID: orderUUID,
 	}, nil)
 	s.accrualWorker.On("Enqueue", mock.Anything).Return(nil)
-	cUuid, err := s.service.Create(s.ctx, []byte("20000006"))
+	cUUID, err := s.service.Create(s.ctx, []byte("20000006"))
 
 	s.Require().NoError(err)
-	s.Require().Equal(cUuid, orderUUID.String())
+	s.Require().Equal(cUUID, orderUUID.String())
 }

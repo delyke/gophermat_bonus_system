@@ -40,7 +40,7 @@ func (s *ServiceSuite) TestCreateLuhnInvalid() {
 	err := s.service.Create(s.ctx, []byte("495599"), 100)
 
 	s.Require().Error(err)
-	s.Require().ErrorIs(err, model.ErrOrderIdLuhnInvalid)
+	s.Require().ErrorIs(err, model.ErrOrderIDLuhnInvalid)
 }
 
 func (s *ServiceSuite) TestCreateGetBalanceError() {

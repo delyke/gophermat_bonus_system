@@ -17,6 +17,6 @@ func (a *api) GetOrdersNumberList(ctx context.Context) (bonusV1.GetOrdersNumberL
 	if len(orders) == 0 {
 		return &bonusV1.GetOrdersNumberListNoContent{}, nil
 	}
-	apiOrders := converter.ServiceOrdersListToApi(orders)
+	apiOrders := converter.ServiceOrdersListToAPI(orders)
 	return lo.ToPtr(bonusV1.GetOrdersNumberListResponse(apiOrders)), nil
 }

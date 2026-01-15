@@ -2,7 +2,7 @@ package defaults
 
 type loggerDefaultConfig struct {
 	Level  string
-	AsJson bool
+	AsJSON bool
 }
 
 type loggerConfig struct {
@@ -12,7 +12,7 @@ type loggerConfig struct {
 func NewDefaultLoggerConfig() *loggerConfig {
 	var raw loggerDefaultConfig
 	raw.Level = LoggerLogLevel
-	raw.AsJson = LoggerAsJson
+	raw.AsJSON = LoggerAsJSON
 	return &loggerConfig{raw: raw}
 }
 
@@ -20,6 +20,6 @@ func (ld *loggerConfig) Level() string {
 	return ld.raw.Level
 }
 
-func (ld *loggerConfig) AsJson() bool {
-	return ld.raw.AsJson
+func (ld *loggerConfig) AsJSON() bool {
+	return ld.raw.AsJSON
 }

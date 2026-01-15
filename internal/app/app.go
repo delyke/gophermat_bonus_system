@@ -61,7 +61,7 @@ func (a *App) initDI(_ context.Context) error {
 func (a *App) initLogger(_ context.Context) error {
 	return logger.Init(
 		config.Get().Logger.Level(),
-		config.Get().Logger.AsJson(),
+		config.Get().Logger.AsJSON(),
 	)
 }
 
@@ -134,7 +134,7 @@ func (a *App) ShowConfig(ctx context.Context) error {
 	logger.Debug(ctx, "App configuration:", zap.Any("config", config.Get()))
 	logger.Debug(ctx,
 		"Logger config:",
-		zap.Any("asJson", config.Get().Logger.AsJson()),
+		zap.Any("asJson", config.Get().Logger.AsJSON()),
 		zap.Any("level", config.Get().Logger.Level()),
 	)
 

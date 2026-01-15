@@ -10,17 +10,17 @@ import (
 )
 
 func (a *api) BalanceWithdrawal(ctx context.Context, req *bonusV1.BalanceWithdrawalRequest) (bonusV1.BalanceWithdrawalRes, error) {
-	orderId := req.Order
+	orderID := req.Order
 	sum := req.Sum
 
-	err := a.bonusService.Withdrawals().Create(ctx, []byte(orderId), sum)
+	err := a.bonusService.Withdrawals().Create(ctx, []byte(orderID), sum)
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrUnauthorized):
 			return &bonusV1.BalanceWithdrawalUnauthorized{}, nil
 		case errors.Is(err, model.ErrNotEnoughBalance):
 			return &bonusV1.BalanceWithdrawalPaymentRequired{}, nil
-		case errors.Is(err, model.ErrOrderIdLuhnInvalid):
+		case errors.Is(err, model.ErrOrderIDLuhnInvalid):
 			return &bonusV1.BalanceWithdrawalUnprocessableEntity{}, nil
 		case errors.Is(err, model.ErrBadCredentials):
 			return &bonusV1.BalanceWithdrawalUnprocessableEntity{}, nil

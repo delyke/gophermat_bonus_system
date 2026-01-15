@@ -5,10 +5,10 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func ServiceOrdersListToApi(in []*model.Order) []bonusV1.OrderDto {
+func ServiceOrdersListToAPI(in []*model.Order) []bonusV1.OrderDto {
 	out := make([]bonusV1.OrderDto, len(in))
 	for i := range in {
-		out[i] = ServiceOrderToApi(*in[i])
+		out[i] = ServiceOrderToAPI(*in[i])
 	}
 	return out
 }

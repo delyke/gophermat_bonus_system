@@ -93,7 +93,7 @@ func (di *diContainer) BonusServer(ctx context.Context) *bonusV1.Server {
 
 func (di *diContainer) BonusV1Api(ctx context.Context) bonusV1.Handler {
 	if di.bonusV1API == nil {
-		di.bonusV1API = bonusV1Api.NewApi(di.BonusService(ctx))
+		di.bonusV1API = bonusV1Api.NewAPI(di.BonusService(ctx))
 	}
 	return di.bonusV1API
 }

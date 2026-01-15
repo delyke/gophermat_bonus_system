@@ -8,7 +8,7 @@ import (
 
 type loggerEnvConfig struct {
 	Level  *string `env:"LOGGER_LEVEL"`
-	AsJson *bool   `env:"LOGGER_AS_JSON"`
+	AsJSON *bool   `env:"LOGGER_AS_JSON"`
 }
 
 type loggerConfig struct {
@@ -21,7 +21,7 @@ func NewLoggerConfig() (*loggerConfig, error) {
 	if err := env.Parse(&raw); err != nil {
 		return nil, err
 	}
-	if raw.Level == nil && raw.AsJson == nil {
+	if raw.Level == nil && raw.AsJSON == nil {
 		return nil, nil
 	}
 	return &loggerConfig{raw: raw}, nil
@@ -34,9 +34,9 @@ func (cfg *loggerConfig) Level() string {
 	return *cfg.raw.Level
 }
 
-func (cfg *loggerConfig) AsJson() bool {
-	if cfg == nil || cfg.raw.AsJson == nil {
-		return defaults.LoggerAsJson
+func (cfg *loggerConfig) AsJSON() bool {
+	if cfg == nil || cfg.raw.AsJSON == nil {
+		return defaults.LoggerAsJSON
 	}
-	return *cfg.raw.AsJson
+	return *cfg.raw.AsJSON
 }

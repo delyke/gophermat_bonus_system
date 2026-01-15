@@ -5,7 +5,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func ServiceWithdrawalToApi(in model.Withdrawal) bonusV1.WithdrawalDto {
+func ServiceWithdrawalToAPI(in model.Withdrawal) bonusV1.WithdrawalDto {
 	return bonusV1.WithdrawalDto{
 		Order:       in.OrderID,
 		Sum:         in.Amount,

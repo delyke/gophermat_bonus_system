@@ -3,7 +3,7 @@ package defaults
 // Logger defaults
 var (
 	LoggerLogLevel = "debug"
-	LoggerAsJson   = true
+	LoggerAsJSON   = true
 )
 
 // Accrual defaults

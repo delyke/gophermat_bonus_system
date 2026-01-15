@@ -17,7 +17,7 @@ func (r errorReader) Read(_ []byte) (int, error) {
 	return 0, r.err
 }
 
-func (s *ApiSuite) TestOrderNumberLoadReadError() {
+func (s *APISuite) TestOrderNumberLoadReadError() {
 	req := bonusV1.OrderNumberLoadReq{Data: errorReader{err: io.ErrUnexpectedEOF}}
 
 	res, err := s.api.OrderNumberLoad(s.ctx, req)
@@ -26,7 +26,7 @@ func (s *ApiSuite) TestOrderNumberLoadReadError() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadBadRequest{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadEmptyBody() {
+func (s *APISuite) TestOrderNumberLoadEmptyBody() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("   ")}
 
 	res, err := s.api.OrderNumberLoad(s.ctx, req)
@@ -35,7 +35,7 @@ func (s *ApiSuite) TestOrderNumberLoadEmptyBody() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadBadRequest{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadBadCredentials() {
+func (s *APISuite) TestOrderNumberLoadBadCredentials() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("20000006")}
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("", model.ErrBadCredentials)
@@ -46,10 +46,10 @@ func (s *ApiSuite) TestOrderNumberLoadBadCredentials() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadBadRequest{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadLuhnInvalid() {
+func (s *APISuite) TestOrderNumberLoadLuhnInvalid() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("20000006")}
 	s.bonusService.On("Orders").Return(s.orderService)
-	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("", model.ErrOrderIdLuhnInvalid)
+	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("", model.ErrOrderIDLuhnInvalid)
 
 	res, err := s.api.OrderNumberLoad(s.ctx, req)
 
@@ -57,7 +57,7 @@ func (s *ApiSuite) TestOrderNumberLoadLuhnInvalid() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadUnprocessableEntity{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadUnauthorized() {
+func (s *APISuite) TestOrderNumberLoadUnauthorized() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("20000006")}
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("", model.ErrUnauthorized)
@@ -68,7 +68,7 @@ func (s *ApiSuite) TestOrderNumberLoadUnauthorized() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadUnauthorized{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadConflict() {
+func (s *APISuite) TestOrderNumberLoadConflict() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("20000006")}
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("", model.ErrOrderBelongsToAnotherUser)
@@ -79,7 +79,7 @@ func (s *ApiSuite) TestOrderNumberLoadConflict() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadConflict{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadAlreadyUploaded() {
+func (s *APISuite) TestOrderNumberLoadAlreadyUploaded() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("20000006")}
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("", model.ErrOrderAlreadyUploaded)
@@ -90,7 +90,7 @@ func (s *ApiSuite) TestOrderNumberLoadAlreadyUploaded() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadOK{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadInternalServerError() {
+func (s *APISuite) TestOrderNumberLoadInternalServerError() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("20000006")}
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("", errors.New("unexpected error"))
@@ -101,7 +101,7 @@ func (s *ApiSuite) TestOrderNumberLoadInternalServerError() {
 	s.Require().IsType(&bonusV1.OrderNumberLoadInternalServerError{}, res)
 }
 
-func (s *ApiSuite) TestOrderNumberLoadAccepted() {
+func (s *APISuite) TestOrderNumberLoadAccepted() {
 	req := bonusV1.OrderNumberLoadReq{Data: strings.NewReader("20000006")}
 	s.bonusService.On("Orders").Return(s.orderService)
 	s.orderService.On("Create", s.ctx, []byte("20000006")).Return("uuid", nil)

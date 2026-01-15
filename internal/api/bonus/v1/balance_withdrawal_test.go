@@ -7,7 +7,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func (s *ApiSuite) TestBalanceWithdrawalUnauthorized() {
+func (s *APISuite) TestBalanceWithdrawalUnauthorized() {
 	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrUnauthorized)
@@ -18,7 +18,7 @@ func (s *ApiSuite) TestBalanceWithdrawalUnauthorized() {
 	s.Require().IsType(&bonusV1.BalanceWithdrawalUnauthorized{}, res)
 }
 
-func (s *ApiSuite) TestBalanceWithdrawalNotEnoughBalance() {
+func (s *APISuite) TestBalanceWithdrawalNotEnoughBalance() {
 	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrNotEnoughBalance)
@@ -29,10 +29,10 @@ func (s *ApiSuite) TestBalanceWithdrawalNotEnoughBalance() {
 	s.Require().IsType(&bonusV1.BalanceWithdrawalPaymentRequired{}, res)
 }
 
-func (s *ApiSuite) TestBalanceWithdrawalInvalidOrder() {
+func (s *APISuite) TestBalanceWithdrawalInvalidOrder() {
 	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
-	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrOrderIdLuhnInvalid)
+	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrOrderIDLuhnInvalid)
 
 	res, err := s.api.BalanceWithdrawal(s.ctx, req)
 
@@ -40,7 +40,7 @@ func (s *ApiSuite) TestBalanceWithdrawalInvalidOrder() {
 	s.Require().IsType(&bonusV1.BalanceWithdrawalUnprocessableEntity{}, res)
 }
 
-func (s *ApiSuite) TestBalanceWithdrawalBadCredentials() {
+func (s *APISuite) TestBalanceWithdrawalBadCredentials() {
 	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrBadCredentials)
@@ -51,7 +51,7 @@ func (s *ApiSuite) TestBalanceWithdrawalBadCredentials() {
 	s.Require().IsType(&bonusV1.BalanceWithdrawalUnprocessableEntity{}, res)
 }
 
-func (s *ApiSuite) TestBalanceWithdrawalInternalServerError() {
+func (s *APISuite) TestBalanceWithdrawalInternalServerError() {
 	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(errors.New("unexpected error"))
@@ -62,7 +62,7 @@ func (s *ApiSuite) TestBalanceWithdrawalInternalServerError() {
 	s.Require().IsType(&bonusV1.BalanceWithdrawalInternalServerError{}, res)
 }
 
-func (s *ApiSuite) TestBalanceWithdrawalOK() {
+func (s *APISuite) TestBalanceWithdrawalOK() {
 	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
 	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
 	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(nil)

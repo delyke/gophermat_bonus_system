@@ -22,10 +22,10 @@ var (
 
 // Ошибки модели Order
 var (
-	// ErrOrderIdLuhnInvalid - номер не валиден по алгоритму Луна
-	ErrOrderIdLuhnInvalid = errors.New("order id invalid")
-	// ErrOrderIdAlreadyExists - номер заказа уже загружен в базу
-	ErrOrderIdAlreadyExists = errors.New("order id already exists")
+	// ErrOrderIDLuhnInvalid - номер не валиден по алгоритму Луна
+	ErrOrderIDLuhnInvalid = errors.New("order id invalid")
+	// ErrOrderIDAlreadyExists - номер заказа уже загружен в базу
+	ErrOrderIDAlreadyExists = errors.New("order id already exists")
 	// ErrOrderBelongsToAnotherUser - номер заказа принадлежит другому пользователю
 	ErrOrderBelongsToAnotherUser = errors.New("order belongs to another user")
 	// ErrOrderAlreadyUploaded - заказ с таким номером уже был загружен этим пользоваетем

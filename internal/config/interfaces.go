@@ -4,7 +4,7 @@ import "time"
 
 type LoggerConfig interface {
 	Level() string
-	AsJson() bool
+	AsJSON() bool
 }
 
 type PostgresConfig interface {

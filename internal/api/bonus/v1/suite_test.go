@@ -12,7 +12,7 @@ import (
 	serviceMocks "github.com/delyke/gophermat_bonus_system/internal/service/mocks"
 )
 
-type ApiSuite struct {
+type APISuite struct {
 	suite.Suite
 	ctx               context.Context //nolint:containedctx
 	api               *api
@@ -23,13 +23,13 @@ type ApiSuite struct {
 	originalArgs      []string
 }
 
-func (s *ApiSuite) SetupTest() {
+func (s *APISuite) SetupTest() {
 	s.ctx = context.Background()
 	s.bonusService = serviceMocks.NewBonusService(s.T())
 	s.userService = serviceMocks.NewUserService(s.T())
 	s.orderService = serviceMocks.NewOrderService(s.T())
 	s.withdrawalService = serviceMocks.NewWithdrawalService(s.T())
-	s.api = NewApi(s.bonusService)
+	s.api = NewAPI(s.bonusService)
 	s.originalArgs = os.Args
 	os.Args = []string{os.Args[0]}
 	err := config.Load()
@@ -38,12 +38,12 @@ func (s *ApiSuite) SetupTest() {
 	s.Require().NoError(err)
 }
 
-func (s *ApiSuite) TearDownTest() {
+func (s *APISuite) TearDownTest() {
 	if s.originalArgs != nil {
 		os.Args = s.originalArgs
 	}
 }
 
 func TestApiSuite(t *testing.T) {
-	suite.Run(t, new(ApiSuite))
+	suite.Run(t, new(APISuite))
 }

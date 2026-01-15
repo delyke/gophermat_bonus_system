@@ -5,10 +5,10 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func ServiceOrderToApi(serviceOrder model.Order) bonusV1.OrderDto {
+func ServiceOrderToAPI(serviceOrder model.Order) bonusV1.OrderDto {
 	return bonusV1.OrderDto{
 		Number:     serviceOrder.OrderID,
-		Status:     ServiceOrderStatusToApi(serviceOrder.Status),
+		Status:     ServiceOrderStatusToAPI(serviceOrder.Status),
 		Accrual:    Float64PtrToOptFloat64(serviceOrder.Accrual),
 		UploadedAt: serviceOrder.UploadedAt,
 	}

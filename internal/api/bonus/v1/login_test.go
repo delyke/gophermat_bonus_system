@@ -8,7 +8,7 @@ import (
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
 
-func (s *ApiSuite) TestLoginUserBadCredentials() {
+func (s *APISuite) TestLoginUserBadCredentials() {
 	req := &bonusV1.LoginRequest{Login: "max", Password: ""}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Login", s.ctx, "max", "").Return("", model.ErrBadCredentials)
@@ -19,7 +19,7 @@ func (s *ApiSuite) TestLoginUserBadCredentials() {
 	s.Require().IsType(&bonusV1.LoginUserBadRequest{}, res)
 }
 
-func (s *ApiSuite) TestLoginUserUnauthorized() {
+func (s *APISuite) TestLoginUserUnauthorized() {
 	req := &bonusV1.LoginRequest{Login: "max", Password: "123"}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Login", s.ctx, "max", "123").Return("", model.ErrUserNotFound)
@@ -30,7 +30,7 @@ func (s *ApiSuite) TestLoginUserUnauthorized() {
 	s.Require().IsType(&bonusV1.LoginUserUnauthorized{}, res)
 }
 
-func (s *ApiSuite) TestLoginUserInternalServerError() {
+func (s *APISuite) TestLoginUserInternalServerError() {
 	req := &bonusV1.LoginRequest{Login: "max", Password: "123"}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Login", s.ctx, "max", "123").Return("", errors.New("unexpected error"))
@@ -41,7 +41,7 @@ func (s *ApiSuite) TestLoginUserInternalServerError() {
 	s.Require().IsType(&bonusV1.LoginUserInternalServerError{}, res)
 }
 
-func (s *ApiSuite) TestLoginUserOK() {
+func (s *APISuite) TestLoginUserOK() {
 	req := &bonusV1.LoginRequest{Login: "max", Password: "123"}
 	s.bonusService.On("Users").Return(s.userService)
 	s.userService.On("Login", s.ctx, "max", "123").Return("token", nil)

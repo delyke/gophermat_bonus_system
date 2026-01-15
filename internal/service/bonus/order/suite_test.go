@@ -46,22 +46,22 @@ func TestServiceIntegration(t *testing.T) {
 }
 
 func (s *ServiceSuite) CreateFakeOrder() *model.Order {
-	oUuid, err := uuid.Parse(s.faker.UUID())
+	oUUID, err := uuid.Parse(s.faker.UUID())
 	if err != nil {
 		panic(err)
 	}
 
-	oUserUuid, err := uuid.Parse(s.faker.UUID())
+	oUserUUID, err := uuid.Parse(s.faker.UUID())
 	if err != nil {
 		panic(err)
 	}
 
 	return &model.Order{
-		UUID:       oUuid,
+		UUID:       oUUID,
 		OrderID:    s.faker.Phrase(),
 		Status:     model.OrderProcessing,
 		Accrual:    nil,
-		UserUUID:   oUserUuid,
+		UserUUID:   oUserUUID,
 		UploadedAt: time.Time{},
 	}
 }
