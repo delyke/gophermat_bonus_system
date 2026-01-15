@@ -105,8 +105,8 @@ func (s *ServiceSuite) TestCreateOrderSuccess() {
 		UUID: orderUUID,
 	}, nil)
 	s.accrualWorker.On("Enqueue", mock.Anything).Return(nil)
-	cUuid, err := s.service.Create(s.ctx, []byte("20000006"))
+	cUUID, err := s.service.Create(s.ctx, []byte("20000006"))
 
 	s.Require().NoError(err)
-	s.Require().Equal(cUuid, orderUUID.String())
+	s.Require().Equal(cUUID, orderUUID.String())
 }
