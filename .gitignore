@@ -26,3 +26,7 @@ vendor/
 /bin
 node_modules
 /shared/api/bundles/
+
+.env
+
+/coverage/

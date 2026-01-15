@@ -1,0 +1,18 @@
+with-expecter: true
+dir: "{{.InterfaceDir}}/mocks"
+filename: "mock_{{.InterfaceNameSnake}}.go"
+outpkg: "mocks"
+mockname: "{{.InterfaceName}}"
+resolve-type-alias: False
+issue-845-fix: True
+
+packages:
+  github.com/delyke/gophermat_bonus_system/internal/service:
+    config:
+      include-regex: ".*(Service|Issuer)"
+  github.com/delyke/gophermat_bonus_system/internal/repository:
+    config:
+      include-regex: ".*Repository"
+  github.com/delyke/gophermat_bonus_system/internal/service/workers:
+    config:
+      include-regex: ".*Worker"

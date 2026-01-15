@@ -1,0 +1,14 @@
+services:
+  placeholder:
+    image: alpine
+    command:
+      ["sh", "-c", "echo 'This is a placeholder service' && sleep infinity"]
+    networks:
+      - gophermat-bonus-net
+
+networks:
+  gophermat-bonus-net:
+    name: gophermat-bonus-net
+    external: false
+    # ВАЖНО: здесь мы создаём сеть с именем gophermat-bonus-net
+    # Другие docker-compose файлы будут к ней подключаться с external: true

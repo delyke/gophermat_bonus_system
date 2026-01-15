@@ -5,7 +5,6 @@ package bonus_v1
 import (
 	"math/bits"
 	"strconv"
-	"time"
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
@@ -24,11 +23,11 @@ func (s *BalanceResponse) Encode(e *jx.Encoder) {
 func (s *BalanceResponse) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("current")
-		e.Float32(s.Current)
+		e.Float64(s.Current)
 	}
 	{
 		e.FieldStart("withdrawn")
-		e.Float32(s.Withdrawn)
+		e.Float64(s.Withdrawn)
 	}
 }
 
@@ -49,8 +48,8 @@ func (s *BalanceResponse) Decode(d *jx.Decoder) error {
 		case "current":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Float32()
-				s.Current = float32(v)
+				v, err := d.Float64()
+				s.Current = float64(v)
 				if err != nil {
 					return err
 				}
@@ -61,8 +60,8 @@ func (s *BalanceResponse) Decode(d *jx.Decoder) error {
 		case "withdrawn":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float32()
-				s.Withdrawn = float32(v)
+				v, err := d.Float64()
+				s.Withdrawn = float64(v)
 				if err != nil {
 					return err
 				}
@@ -141,7 +140,7 @@ func (s *BalanceWithdrawalRequest) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("sum")
-		e.Float32(s.Sum)
+		e.Float64(s.Sum)
 	}
 }
 
@@ -174,8 +173,8 @@ func (s *BalanceWithdrawalRequest) Decode(d *jx.Decoder) error {
 		case "sum":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float32()
-				s.Sum = float32(v)
+				v, err := d.Float64()
+				s.Sum = float64(v)
 				if err != nil {
 					return err
 				}
@@ -235,6 +234,86 @@ func (s *BalanceWithdrawalRequest) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *BalanceWithdrawalRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GenericError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GenericError) encodeFields(e *jx.Encoder) {
+	{
+		if s.Code.Set {
+			e.FieldStart("code")
+			s.Code.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGenericError = [2]string{
+	0: "code",
+	1: "message",
+}
+
+// Decode decodes GenericError from json.
+func (s *GenericError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GenericError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "code":
+			if err := func() error {
+				s.Code.Reset()
+				if err := s.Code.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"code\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GenericError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GenericError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GenericError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -452,72 +531,107 @@ func (s *LoginRequest) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes time.Time as json.
-func (o OptDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
+// Encode encodes float64 as json.
+func (o OptFloat64) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	format(e, o.Value)
+	e.Float64(float64(o.Value))
 }
 
-// Decode decodes time.Time from json.
-func (o *OptDateTime) Decode(d *jx.Decoder, format func(*jx.Decoder) (time.Time, error)) error {
+// Decode decodes float64 from json.
+func (o *OptFloat64) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptDateTime to nil")
+		return errors.New("invalid: unable to decode OptFloat64 to nil")
 	}
 	o.Set = true
-	v, err := format(d)
+	v, err := d.Float64()
 	if err != nil {
 		return err
 	}
-	o.Value = v
+	o.Value = float64(v)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptDateTime) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e, json.EncodeDateTime)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptDateTime) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d, json.DecodeDateTime)
-}
-
-// Encode encodes float32 as json.
-func (o OptFloat32) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Float32(float32(o.Value))
-}
-
-// Decode decodes float32 from json.
-func (o *OptFloat32) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptFloat32 to nil")
-	}
-	o.Set = true
-	v, err := d.Float32()
-	if err != nil {
-		return err
-	}
-	o.Value = float32(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptFloat32) MarshalJSON() ([]byte, error) {
+func (s OptFloat64) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptFloat32) UnmarshalJSON(data []byte) error {
+func (s *OptFloat64) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes int as json.
+func (o OptInt) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Int(int(o.Value))
+}
+
+// Decode decodes int from json.
+func (o *OptInt) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptInt to nil")
+	}
+	o.Set = true
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	o.Value = int(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptInt) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptInt) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes string as json.
+func (o OptString) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes string from json.
+func (o *OptString) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptString to nil")
+	}
+	o.Set = true
+	v, err := d.Str()
+	if err != nil {
+		return err
+	}
+	o.Value = string(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptString) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -839,13 +953,11 @@ func (s *WithdrawalDto) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("sum")
-		e.Float32(s.Sum)
+		e.Float64(s.Sum)
 	}
 	{
-		if s.ProcessedAt.Set {
-			e.FieldStart("processed_at")
-			s.ProcessedAt.Encode(e, json.EncodeDateTime)
-		}
+		e.FieldStart("processed_at")
+		json.EncodeDateTime(e, s.ProcessedAt)
 	}
 }
 
@@ -879,8 +991,8 @@ func (s *WithdrawalDto) Decode(d *jx.Decoder) error {
 		case "sum":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float32()
-				s.Sum = float32(v)
+				v, err := d.Float64()
+				s.Sum = float64(v)
 				if err != nil {
 					return err
 				}
@@ -889,9 +1001,11 @@ func (s *WithdrawalDto) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"sum\"")
 			}
 		case "processed_at":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.ProcessedAt.Reset()
-				if err := s.ProcessedAt.Decode(d, json.DecodeDateTime); err != nil {
+				v, err := json.DecodeDateTime(d)
+				s.ProcessedAt = v
+				if err != nil {
 					return err
 				}
 				return nil
@@ -908,7 +1022,7 @@ func (s *WithdrawalDto) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

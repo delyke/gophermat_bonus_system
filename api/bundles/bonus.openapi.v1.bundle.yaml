@@ -28,16 +28,22 @@ paths:
             Set-Cookie:
               description: |
                 Устанавливает cookie с JWT токеном.
-                HttpOnly, Secure, SameSite.
+                HttpOnly.
               schema:
                 type: string
-                example: refresh_token=abc.def.ghi; Path=/; HttpOnly; Secure; SameSite=Strict
+                example: access_token=eyJ...; Path=/; HttpOnly; Secure; SameSite=Lax
         '400':
           description: Неверный формат запроса
         '409':
           description: Логин уже занят
         '500':
           description: Внутренняя ошибка сервера
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
   /api/user/login:
     post:
       summary: Аутентификация пользователя
@@ -57,16 +63,22 @@ paths:
             Set-Cookie:
               description: |
                 Устанавливает cookie с JWT токеном.
-                HttpOnly, Secure, SameSite.
+                HttpOnly
               schema:
                 type: string
-                example: refresh_token=abc.def.ghi; Path=/; HttpOnly; Secure; SameSite=Strict
+                example: access_token=eyJ...; Path=/; HttpOnly; Secure; SameSite=Lax
         '400':
           description: Неверный формат запроса
         '401':
           description: Неверная пара логин/пароль
         '500':
           description: Внутренняя ошибка сервера
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
   /api/user/orders:
     post:
       summary: Загрузка номера заказа
@@ -96,6 +108,12 @@ paths:
           description: Неверный формат номера заказа
         '500':
           description: Внутренняя ошибка сервера
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
     get:
       summary: Получение списка загруженных номеров заказов
       operationId: GetOrdersNumberList
@@ -116,6 +134,12 @@ paths:
           description: Пользователь не авторизован
         '500':
           description: Внутренняя ошибка сервера
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
   /api/user/balance:
     get:
       summary: Получение текущего баланса пользователя
@@ -135,6 +159,12 @@ paths:
           description: Пользователь не авторизован
         '500':
           description: Внутренняя ошибка сервера
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
   /api/user/balance/withdraw:
     post:
       summary: Запрос на списание средств
@@ -160,6 +190,12 @@ paths:
           description: Неверный номер заказа
         '500':
           description: Внутренняя ошибка сервера
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
   /api/user/withdrawals:
     get:
       summary: Получение информации о выводе средств
@@ -181,6 +217,12 @@ paths:
           description: Пользователь не авторизован
         '500':
           description: Внутренняя ошибка сервера
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/generic_error'
 components:
   securitySchemes:
     JwtCookieAuth:
@@ -203,6 +245,15 @@ components:
           type: string
           description: Пароль пользователя
           example: password123
+    generic_error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: HTTP-код ошибки
+        message:
+          type: string
+          description: Описание ошибки
     login_request:
       type: object
       required:
@@ -242,7 +293,7 @@ components:
           $ref: '#/components/schemas/order_status'
         accrual:
           type: number
-          format: float
+          format: float64
           description: Сумма начисления
           example: 500.5
         uploaded_at:
@@ -267,12 +318,12 @@ components:
       properties:
         current:
           type: number
-          format: float
+          format: float64
           description: Данные о текущей сумме баллов лояльности
           example: 500.5
         withdrawn:
           type: number
-          format: float
+          format: float64
           description: Сумма использованных за весь период регистрации баллов
           example: 42
     balance_withdrawal_request:
@@ -288,13 +339,14 @@ components:
           example: '2377225624'
         sum:
           type: number
-          format: float
+          format: float64
           description: Сумма баллов к списанию в счет оплаты
     withdrawal_dto:
       type: object
       required:
         - order
         - sum
+        - processed_at
       properties:
         order:
           type: string
@@ -303,7 +355,7 @@ components:
           example: '2377225624'
         sum:
           type: number
-          format: float
+          format: float64
           description: Сумма вывода
           example: 500
         processed_at:

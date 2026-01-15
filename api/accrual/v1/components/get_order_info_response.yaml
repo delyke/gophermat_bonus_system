@@ -1,0 +1,17 @@
+type: object
+required:
+  - order
+  - status
+properties:
+  order:
+    type: string
+    description: Номер заказа
+    format: digits only
+    example: "2377225624"
+  status:
+    $ref: "./enums/order_status.yaml"
+  accrual:
+    type: number
+    description: Рассчитанные баллы к начислению, при отсутствии начисления - поле отсутствует в ответе
+    format: float64
+    example: 500.1
