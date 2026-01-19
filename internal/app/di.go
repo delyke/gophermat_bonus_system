@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -11,6 +10,7 @@ import (
 	bonusV1Api "github.com/delyke/gophermat_bonus_system/internal/api/bonus/v1"
 	"github.com/delyke/gophermat_bonus_system/internal/closer"
 	"github.com/delyke/gophermat_bonus_system/internal/config"
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/repository"
 	bonusRepository "github.com/delyke/gophermat_bonus_system/internal/repository/bonus"
 	"github.com/delyke/gophermat_bonus_system/internal/service"
@@ -36,7 +36,6 @@ type diContainer struct {
 }
 
 func NewDIContainer(appLogger *logger.Logger) *diContainer {
-
 	return &diContainer{logger: appLogger}
 }
 

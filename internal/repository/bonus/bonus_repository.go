@@ -1,9 +1,9 @@
 package bonus
 
 import (
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	def "github.com/delyke/gophermat_bonus_system/internal/repository"
 	ordersRepo "github.com/delyke/gophermat_bonus_system/internal/repository/bonus/order"
 	usersRepo "github.com/delyke/gophermat_bonus_system/internal/repository/bonus/user"

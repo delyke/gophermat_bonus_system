@@ -34,4 +34,5 @@ type BonusRepository interface {
 	Users() UserRepository
 	Orders() OrderRepository
 	Withdrawals() WithdrawalRepository
+	CreateWithdrawalWithBalance(ctx context.Context, withdrawal *model.Withdrawal) error
 }

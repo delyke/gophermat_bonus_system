@@ -26,14 +26,6 @@ func (s *service) Create(ctx context.Context, orderID []byte, sum float64) error
 		return model.ErrOrderIDLuhnInvalid
 	}
 
-	cBalance, err := s.bonusRepository.Users().GetBalanceByUUID(ctx, principal.UserUUID)
-	if err != nil {
-		return err
-	}
-	if cBalance < sum {
-		return model.ErrNotEnoughBalance
-	}
-
 	withdrawal := &model.Withdrawal{
 		UserUUID:    principal.UserUUID,
 		OrderID:     string(orderID),
@@ -41,12 +33,7 @@ func (s *service) Create(ctx context.Context, orderID []byte, sum float64) error
 		ProcessedAt: time.Now(),
 	}
 
-	err = s.bonusRepository.Withdrawals().Create(ctx, withdrawal)
-	if err != nil {
-		return err
-	}
-	newBalance := cBalance - sum
-	err = s.bonusRepository.Users().SetBalanceByUUID(ctx, principal.UserUUID, newBalance)
+	err = s.bonusRepository.CreateWithdrawalWithBalance(ctx, withdrawal)
 	if err != nil {
 		return err
 	}

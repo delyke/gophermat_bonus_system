@@ -18,7 +18,8 @@ type service struct {
 func NewService(
 	bonusRepository repository.BonusRepository,
 	accrualWorker workers.AccrualWorker,
-	logger *logger.Logger) *service {
+	logger *logger.Logger,
+) *service {
 	return &service{
 		bonusRepository: bonusRepository,
 		accrualWorker:   accrualWorker,

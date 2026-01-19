@@ -49,9 +49,8 @@ func (s *ServiceSuite) TestCreateGetBalanceError() {
 		UserUUID: userUUID,
 		Login:    "max",
 	})
-	unexpectedErr := errors.New("balance error")
-	s.bonusRepository.On("Users").Return(s.userRepository)
-	s.userRepository.On("GetBalanceByUUID", s.ctx, userUUID).Return(0.0, unexpectedErr)
+	unexpectedErr := errors.New("withdrawal error")
+	s.bonusRepository.On("CreateWithdrawalWithBalance", s.ctx, mock.Anything).Return(unexpectedErr)
 
 	err := s.service.Create(s.ctx, []byte("20000006"), 100)
 
@@ -65,8 +64,7 @@ func (s *ServiceSuite) TestCreateNotEnoughBalance() {
 		UserUUID: userUUID,
 		Login:    "max",
 	})
-	s.bonusRepository.On("Users").Return(s.userRepository)
-	s.userRepository.On("GetBalanceByUUID", s.ctx, userUUID).Return(50.0, nil)
+	s.bonusRepository.On("CreateWithdrawalWithBalance", s.ctx, mock.Anything).Return(model.ErrNotEnoughBalance)
 
 	err := s.service.Create(s.ctx, []byte("20000006"), 100)
 
@@ -81,30 +79,7 @@ func (s *ServiceSuite) TestCreateWithdrawalError() {
 		Login:    "max",
 	})
 	unexpectedErr := errors.New("create withdrawal error")
-	s.bonusRepository.On("Users").Return(s.userRepository)
-	s.bonusRepository.On("Withdrawals").Return(s.withdrawalRepository)
-	s.userRepository.On("GetBalanceByUUID", s.ctx, userUUID).Return(200.0, nil)
-	s.withdrawalRepository.On("Create", s.ctx, mock.Anything).Return(unexpectedErr)
-
-	err := s.service.Create(s.ctx, []byte("20000006"), 100)
-
-	s.Require().Error(err)
-	s.Require().ErrorIs(err, unexpectedErr)
-}
-
-func (s *ServiceSuite) TestCreateSetBalanceError() {
-	userUUID := uuid.New()
-	s.ctx = authctx.WithPrincipal(s.ctx, authctx.Principal{
-		UserUUID: userUUID,
-		Login:    "max",
-	})
-	unexpectedErr := errors.New("set balance error")
-	s.bonusRepository.On("Users").Return(s.userRepository)
-	s.bonusRepository.On("Withdrawals").Return(s.withdrawalRepository)
-	s.userRepository.On("GetBalanceByUUID", s.ctx, userUUID).Return(200.0, nil)
-	s.withdrawalRepository.On("Create", s.ctx, mock.Anything).Return(nil)
-	s.userRepository.On("SetBalanceByUUID", s.ctx, userUUID, 100.0).Return(unexpectedErr)
-
+	s.bonusRepository.On("CreateWithdrawalWithBalance", s.ctx, mock.Anything).Return(unexpectedErr)
 	err := s.service.Create(s.ctx, []byte("20000006"), 100)
 
 	s.Require().Error(err)
@@ -117,11 +92,8 @@ func (s *ServiceSuite) TestCreateSuccess() {
 		UserUUID: userUUID,
 		Login:    "max",
 	})
-	s.bonusRepository.On("Users").Return(s.userRepository)
-	s.bonusRepository.On("Withdrawals").Return(s.withdrawalRepository)
-	s.userRepository.On("GetBalanceByUUID", s.ctx, userUUID).Return(200.0, nil)
-	s.withdrawalRepository.On("Create", s.ctx, mock.Anything).Return(nil)
-	s.userRepository.On("SetBalanceByUUID", s.ctx, userUUID, 100.0).Return(nil)
+
+	s.bonusRepository.On("CreateWithdrawalWithBalance", s.ctx, mock.Anything).Return(nil)
 
 	err := s.service.Create(s.ctx, []byte("20000006"), 100)
 

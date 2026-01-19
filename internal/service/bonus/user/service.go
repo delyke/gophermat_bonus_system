@@ -17,7 +17,8 @@ type service struct {
 func NewService(
 	bonusRepository repository.BonusRepository,
 	tokenIssuer def.TokenIssuer,
-	logger *logger.Logger) *service {
+	logger *logger.Logger,
+) *service {
 	return &service{
 		bonusRepository: bonusRepository,
 		tokenIssuer:     tokenIssuer,

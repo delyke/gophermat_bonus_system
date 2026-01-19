@@ -3,13 +3,13 @@ package v1
 import (
 	"context"
 	"errors"
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"net/http"
 	"time"
 
 	"github.com/ogen-go/ogen/ogenerrors"
 
 	"github.com/delyke/gophermat_bonus_system/internal/config"
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/service"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
