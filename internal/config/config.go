@@ -144,20 +144,20 @@ func bindFlags(v *viper.Viper) error {
 
 	fs.String("l", "", "Log level")
 	fs.Bool("j", false, "Use JSON log format")
-	fs.String("r", "", "Accrual system address")
+	fs.StringP("accrual-url", "r", "", "Accrual system address")
 	fs.Int("w", 0, "Accrual workers count")
-	fs.String("a", "", "HTTP listen address")
+	fs.StringP("address", "a", "", "HTTP listen address")
 	fs.String("rt", "", "HTTP read timeout")
 	fs.String("pghost", "", "Postgres host")
 	fs.Int("pgport", 0, "Postgres port")
 	fs.String("pguser", "", "Postgres user")
 	fs.String("pgpassword", "", "Postgres password")
 	fs.String("pgdb", "", "Postgres database")
-	fs.String("d", "", "Postgres database URI")
+	fs.StringP("database-uri", "d", "", "Postgres database URI")
 	fs.String("mdir", "", "Directory where migrations")
-	fs.String("jwt_secret", "", "Secret used to sign JWT")
-	fs.String("jwt_ttl", "", "TTL of JWT")
-	fs.String("shutdown_timeout", "", "Shutdown timeout")
+	fs.String("jwt-secret", "", "Secret used to sign JWT")
+	fs.String("jwt-ttl", "", "TTL of JWT")
+	fs.String("shutdown-timeout", "", "Shutdown timeout")
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		return err
@@ -179,7 +179,7 @@ func bindFlags(v *viper.Viper) error {
 		return err
 	}
 
-	if err := bind("accrual.system_address", "r"); err != nil {
+	if err := bind("accrual.system_address", "accrual-url"); err != nil {
 		return err
 	}
 
@@ -187,7 +187,7 @@ func bindFlags(v *viper.Viper) error {
 		return err
 	}
 
-	if err := bind("http.run_address", "a"); err != nil {
+	if err := bind("http.run_address", "address"); err != nil {
 		return err
 	}
 	if err := bind("http.read_timeout", "rt"); err != nil {
@@ -208,20 +208,20 @@ func bindFlags(v *viper.Viper) error {
 	if err := bind("postgres.database", "pgdb"); err != nil {
 		return err
 	}
-	if err := bind("postgres.database_uri", "d"); err != nil {
+	if err := bind("postgres.database_uri", "database-uri"); err != nil {
 		return err
 	}
 	if err := bind("postgres.migration_directory", "mdir"); err != nil {
 		return err
 	}
 
-	if err := bind("jwt.secret", "jwt_secret"); err != nil {
+	if err := bind("jwt.secret", "jwt-secret"); err != nil {
 		return err
 	}
-	if err := bind("jwt.ttl", "jwt_ttl"); err != nil {
+	if err := bind("jwt.ttl", "jwt-ttl"); err != nil {
 		return err
 	}
-	if err := bind("app.shutdown_timeout", "shutdown_timeout"); err != nil {
+	if err := bind("app.shutdown_timeout", "shutdown-timeout"); err != nil {
 		return err
 	}
 	return nil
