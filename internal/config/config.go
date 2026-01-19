@@ -93,7 +93,7 @@ func bindEnv(v *viper.Viper) error {
 	if err := v.BindEnv("logger.as_json", "LOGGER_AS_JSON"); err != nil {
 		return err
 	}
-	if err := v.BindEnv("http.run_address", "RUN_ADDRESS"); err != nil {
+	if err := v.BindEnv("http.run_address", "RUN_ADDRESS", "HTTP_RUN_ADDRESS"); err != nil {
 		return err
 	}
 	if err := v.BindEnv("http.read_timeout", "HTTP_READ_TIMEOUT"); err != nil {
@@ -102,7 +102,7 @@ func bindEnv(v *viper.Viper) error {
 	if err := v.BindEnv("postgres.host", "POSTGRES_HOST"); err != nil {
 		return err
 	}
-	if err := v.BindEnv("postgres.port", "EXTERNAL_POSTGRES_PORT"); err != nil {
+	if err := v.BindEnv("postgres.port", "EXTERNAL_POSTGRES_PORT", "POSTGRES_PORT"); err != nil {
 		return err
 	}
 	if err := v.BindEnv("postgres.user", "POSTGRES_USER"); err != nil {
@@ -114,10 +114,10 @@ func bindEnv(v *viper.Viper) error {
 	if err := v.BindEnv("postgres.database", "POSTGRES_DB"); err != nil {
 		return err
 	}
-	if err := v.BindEnv("postgres.database_uri", "POSTGRES_URI"); err != nil {
+	if err := v.BindEnv("postgres.database_uri", "POSTGRES_URI", "DATABASE_URI"); err != nil {
 		return err
 	}
-	if err := v.BindEnv("postgres.migration_directory", "MIGRATION_DIR"); err != nil {
+	if err := v.BindEnv("postgres.migration_directory", "MIGRATION_DIR", "MIGRATION_DIRECTORY"); err != nil {
 		return err
 	}
 	if err := v.BindEnv("accrual.system_address", "ACCRUAL_SYSTEM_ADDRESS"); err != nil {

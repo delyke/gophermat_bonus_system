@@ -152,10 +152,16 @@ func TestProcessProcessedResponseWithAccrual(t *testing.T) {
 	orderRepo := mocks.NewOrderRepository(t)
 	repo.On("Orders").Return(orderRepo)
 
+	userRepo := mocks.NewUserRepository(t)
+	repo.On("Users").Return(userRepo)
+
 	orderUUID := uuid.New()
 	orderRepo.On("SetStatusByUUID", mock.Anything, orderUUID, model.OrderProcessing).Return(nil)
 	orderRepo.On("SetStatusByUUID", mock.Anything, orderUUID, model.OrderProcessed).Return(nil)
 	orderRepo.On("SetAccrualByUUID", mock.Anything, orderUUID, 10.5).Return(nil)
+
+	userRepo.On("GetBalanceByUUID", mock.Anything, mock.Anything).Return(10.5, nil)
+	userRepo.On("SetBalanceByUUID", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 	client := newAccrualClient(t, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "/api/orders/20000006", r.URL.Path)

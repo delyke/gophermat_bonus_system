@@ -16,7 +16,7 @@ var (
 
 // Bonus HTTP defaults
 var (
-	BonusRunAddress  = ":8080"
+	BonusRunAddress  = "0.0.0.0:8080"
 	BonusReadTimeout = "10s"
 )
 
