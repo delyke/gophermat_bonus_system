@@ -9,7 +9,6 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	"github.com/delyke/gophermat_bonus_system/internal/postgres"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
@@ -50,7 +49,7 @@ func (repo *repository) Create(ctx context.Context, order *model.Order) (*model.
 		if postgres.IsUniqueViolation(err) {
 			return nil, model.ErrOrderIDAlreadyExists
 		}
-		logger.Error(ctx, "[ORDER CREATE] Failed to create order:", zap.Error(err))
+		repo.logger.Error(ctx, "[ORDER CREATE] Failed to create order:", zap.Error(err))
 		return nil, err
 	}
 

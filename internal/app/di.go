@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -31,16 +32,19 @@ type diContainer struct {
 	tokenIssuer     service.TokenIssuer
 	accrualClient   *accrualV1.Client
 	accrualWorker   workers.AccrualWorker
+	logger          *logger.Logger
 }
 
-func NewDIContainer() *diContainer {
-	return &diContainer{}
+func NewDIContainer(appLogger *logger.Logger) *diContainer {
+
+	return &diContainer{logger: appLogger}
 }
 
 func (di *diContainer) AccrualWorker(ctx context.Context) workers.AccrualWorker {
 	if di.accrualWorker == nil {
 		p := workers.NewAccrualProcessor(
 			ctx,
+			di.logger,
 			di.BonusRepository(ctx),
 			di.AccrualClient(ctx), config.Get().Accrual.WorkersCount(),
 		)
@@ -93,21 +97,21 @@ func (di *diContainer) BonusServer(ctx context.Context) *bonusV1.Server {
 
 func (di *diContainer) BonusV1Api(ctx context.Context) bonusV1.Handler {
 	if di.bonusV1API == nil {
-		di.bonusV1API = bonusV1Api.NewAPI(di.BonusService(ctx))
+		di.bonusV1API = bonusV1Api.NewAPI(di.BonusService(ctx), di.logger)
 	}
 	return di.bonusV1API
 }
 
 func (di *diContainer) BonusService(ctx context.Context) service.BonusService {
 	if di.bonusService == nil {
-		di.bonusService = bonusService.NewService(di.BonusRepository(ctx), di.TokenIssuer(), di.AccrualWorker(ctx))
+		di.bonusService = bonusService.NewService(di.BonusRepository(ctx), di.TokenIssuer(), di.AccrualWorker(ctx), di.logger)
 	}
 	return di.bonusService
 }
 
 func (di *diContainer) BonusRepository(ctx context.Context) repository.BonusRepository {
 	if di.bonusRepository == nil {
-		di.bonusRepository = bonusRepository.NewRepository(di.PostgresPool(ctx))
+		di.bonusRepository = bonusRepository.NewRepository(di.PostgresPool(ctx), di.logger)
 	}
 	return di.bonusRepository
 }

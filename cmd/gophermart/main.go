@@ -19,35 +19,39 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("error loading config: %w", err))
 	}
+	appLogger, err := logger.New(config.Get().Logger.Level(), config.Get().Logger.AsJSON())
+	if err != nil {
+		panic(fmt.Errorf("error initializing logger: %w", err))
+	}
 	appCtx, appCancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer appCancel()
-	defer gracefulShutdown()
+	defer gracefulShutdown(appLogger)
 
 	closer.Configure(syscall.SIGINT, syscall.SIGTERM)
 
-	a, err := app.New(appCtx)
+	a, err := app.New(appCtx, appLogger)
 	if err != nil {
-		logger.Fatal(appCtx, "error starting application", zap.Error(err))
+		appLogger.Fatal(appCtx, "error starting application", zap.Error(err))
 		return
 	}
 	err = a.ShowConfig(appCtx)
 	if err != nil {
-		logger.Fatal(appCtx, "error showing config", zap.Error(err))
+		appLogger.Fatal(appCtx, "error showing config", zap.Error(err))
 		return
 	}
 
 	err = a.Run(appCtx)
 	if err != nil {
-		logger.Fatal(appCtx, "error running app", zap.Error(err))
+		appLogger.Fatal(appCtx, "error running app", zap.Error(err))
 		return
 	}
 }
 
-func gracefulShutdown() {
+func gracefulShutdown(appLogger *logger.Logger) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Get().App.ShutdownTimeout())
 	defer cancel()
 
 	if err := closer.CloseAll(ctx); err != nil {
-		logger.Error(ctx, "❌ Ошибка при завершении работы", zap.Error(err))
+		appLogger.Error(ctx, "❌ Ошибка при завершении работы", zap.Error(err))
 	}
 }

@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"net/http"
 	"time"
 
@@ -16,10 +17,11 @@ import (
 type api struct {
 	bonusV1.UnimplementedHandler
 	bonusService service.BonusService
+	logger       *logger.Logger
 }
 
-func NewAPI(bs service.BonusService) *api {
-	return &api{bonusService: bs}
+func NewAPI(bs service.BonusService, l *logger.Logger) *api {
+	return &api{bonusService: bs, logger: l}
 }
 
 func (a *api) NewError(_ context.Context, err error) *bonusV1.GenericErrorStatusCode {

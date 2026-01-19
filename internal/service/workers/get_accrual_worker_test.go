@@ -31,16 +31,16 @@ func newAccrualClient(t *testing.T, handler http.HandlerFunc) *accrualV1.Client 
 }
 
 func TestNewAccrualProcessorStop(t *testing.T) {
-	logger.SetNopLogger()
+	appLogger := logger.NewNop()
 	repo := mocks.NewBonusRepository(t)
 	client := newAccrualClient(t, http.NotFound)
 
-	worker := NewAccrualProcessor(context.Background(), repo, client, 1)
+	worker := NewAccrualProcessor(context.Background(), appLogger, repo, client, 1)
 	worker.Stop()
 }
 
 func TestBootstrapEnqueuesJobs(t *testing.T) {
-	logger.SetNopLogger()
+	appLogger := logger.NewNop()
 	repo := mocks.NewBonusRepository(t)
 	orderRepo := mocks.NewOrderRepository(t)
 	repo.On("Orders").Return(orderRepo)
@@ -61,6 +61,7 @@ func TestBootstrapEnqueuesJobs(t *testing.T) {
 		semaphore:     make(chan struct{}, 1),
 		repo:          repo,
 		accrualClient: newAccrualClient(t, http.NotFound),
+		logger:        appLogger,
 		ctx:           context.Background(),
 	}
 
@@ -111,7 +112,7 @@ func TestEnqueueLaterEnqueuesJob(t *testing.T) {
 }
 
 func TestProcessInvalidResponse(t *testing.T) {
-	logger.SetNopLogger()
+	appLogger := logger.NewNop()
 	repo := mocks.NewBonusRepository(t)
 	orderRepo := mocks.NewOrderRepository(t)
 	repo.On("Orders").Return(orderRepo)
@@ -135,6 +136,7 @@ func TestProcessInvalidResponse(t *testing.T) {
 		repo:          repo,
 		accrualClient: client,
 		ctx:           context.Background(),
+		logger:        appLogger,
 	}
 
 	worker.process(context.Background(), model.OrderJob{
@@ -147,7 +149,7 @@ func TestProcessInvalidResponse(t *testing.T) {
 }
 
 func TestProcessProcessedResponseWithAccrual(t *testing.T) {
-	logger.SetNopLogger()
+	appLogger := logger.NewNop()
 	repo := mocks.NewBonusRepository(t)
 	orderRepo := mocks.NewOrderRepository(t)
 	repo.On("Orders").Return(orderRepo)
@@ -178,6 +180,7 @@ func TestProcessProcessedResponseWithAccrual(t *testing.T) {
 		repo:          repo,
 		accrualClient: client,
 		ctx:           context.Background(),
+		logger:        appLogger,
 	}
 
 	worker.process(context.Background(), model.OrderJob{
@@ -203,17 +206,15 @@ func TestBackoffWithJitterIncrementsAttempts(t *testing.T) {
 }
 
 func TestTooManyRequestsHandlerUpdatesRateLimit(t *testing.T) {
-	err := logger.Init("debug", true)
-	if err != nil {
-		return
-	}
+	appLogger := logger.NewNop()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
 	worker := &AccrualProcessor{
-		jobs: make(chan model.OrderJob, 1),
-		ctx:  ctx,
+		jobs:   make(chan model.OrderJob, 1),
+		ctx:    ctx,
+		logger: appLogger,
 	}
 
 	retry := 2
@@ -230,17 +231,15 @@ func TestTooManyRequestsHandlerUpdatesRateLimit(t *testing.T) {
 }
 
 func TestInternalServerHandlerIncrementsAttempts(t *testing.T) {
-	err := logger.Init("debug", true)
-	if err != nil {
-		return
-	}
+	appLogger := logger.NewNop()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
 	worker := &AccrualProcessor{
-		jobs: make(chan model.OrderJob, 1),
-		ctx:  ctx,
+		jobs:   make(chan model.OrderJob, 1),
+		ctx:    ctx,
+		logger: appLogger,
 	}
 
 	job := model.OrderJob{}

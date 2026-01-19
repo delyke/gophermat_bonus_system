@@ -12,11 +12,11 @@ import (
 )
 
 func TestGooseLoggerAdapterWrite(t *testing.T) {
-	err := logger.Init("debug", true)
+	appLogger, err := logger.New("debug", true)
 	if err != nil {
 		panic(err)
 	}
-	adapter := &GooseLoggerAdapter{}
+	adapter := &GooseLoggerAdapter{logger: appLogger}
 	n, err := adapter.Write([]byte("test log"))
 
 	require.NoError(t, err)
@@ -24,17 +24,17 @@ func TestGooseLoggerAdapterWrite(t *testing.T) {
 }
 
 func TestNewMigrator(t *testing.T) {
-	err := logger.Init("debug", true)
+	appLogger, err := logger.New("debug", true)
 	if err != nil {
 		panic(err)
 	}
-	m := NewMigrator(&sql.DB{}, "migrations")
+	m := NewMigrator(&sql.DB{}, "migrations", appLogger)
 	require.Equal(t, "migrations", m.migrationsDir)
 	require.NotNil(t, m.db)
 }
 
 func TestUpReturnsErrorForInvalidDB(t *testing.T) {
-	err := logger.Init("debug", true)
+	appLogger, err := logger.New("debug", true)
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +44,7 @@ func TestUpReturnsErrorForInvalidDB(t *testing.T) {
 		_ = db.Close()
 	})
 
-	m := NewMigrator(db, t.TempDir())
+	m := NewMigrator(db, t.TempDir(), appLogger)
 	err = m.Up(context.Background())
 
 	require.Error(t, err)

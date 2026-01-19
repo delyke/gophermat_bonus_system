@@ -29,12 +29,10 @@ func (s *APISuite) SetupTest() {
 	s.userService = serviceMocks.NewUserService(s.T())
 	s.orderService = serviceMocks.NewOrderService(s.T())
 	s.withdrawalService = serviceMocks.NewWithdrawalService(s.T())
-	s.api = NewAPI(s.bonusService)
+	s.api = NewAPI(s.bonusService, logger.NewNop())
 	s.originalArgs = os.Args
 	os.Args = []string{os.Args[0]}
 	err := config.Load()
-	s.Require().NoError(err)
-	err = logger.Init("debug", true)
 	s.Require().NoError(err)
 }
 

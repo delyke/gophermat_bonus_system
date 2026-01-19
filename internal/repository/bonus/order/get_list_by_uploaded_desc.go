@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
 	repoModel "github.com/delyke/gophermat_bonus_system/internal/repository/model"
@@ -30,13 +29,13 @@ func (repo *repository) GetListByUploadedDesc(ctx context.Context, userUUID uuid
 
 	query, args, err := builderSelect.ToSql()
 	if err != nil {
-		logger.Error(ctx, "Ошибка при сборке sql запроса", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при сборке sql запроса", zap.Error(err))
 		return nil, err
 	}
 
 	rows, err := repo.pool.Query(ctx, query, args...)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при выборе списка заказов", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при выборе списка заказов", zap.Error(err))
 		return nil, err
 	}
 	defer rows.Close()
@@ -54,7 +53,7 @@ func (repo *repository) GetListByUploadedDesc(ctx context.Context, userUUID uuid
 	for rows.Next() {
 		err = rows.Scan(&gID, &gOrderID, &gOrderStatus, &gAccrual, &gUserUUID, &gUploadedAt)
 		if err != nil {
-			logger.Error(ctx, "Ошибка при переборке полученных заказов", zap.Error(err))
+			repo.logger.Error(ctx, "Ошибка при переборке полученных заказов", zap.Error(err))
 			return nil, err
 		}
 		orders = append(orders, &repoModel.Order{

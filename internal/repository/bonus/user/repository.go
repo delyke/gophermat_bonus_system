@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	def "github.com/delyke/gophermat_bonus_system/internal/repository"
@@ -9,11 +10,13 @@ import (
 var _ def.UserRepository = (*repository)(nil)
 
 type repository struct {
-	pool *pgxpool.Pool
+	pool   *pgxpool.Pool
+	logger *logger.Logger
 }
 
-func NewRepository(pool *pgxpool.Pool) *repository {
+func NewRepository(pool *pgxpool.Pool, l *logger.Logger) *repository {
 	return &repository{
-		pool: pool,
+		pool:   pool,
+		logger: l,
 	}
 }

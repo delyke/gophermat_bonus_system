@@ -8,7 +8,6 @@ import (
 	"github.com/go-faster/errors"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
 )
@@ -16,7 +15,7 @@ import (
 func (a *api) OrderNumberLoad(ctx context.Context, req bonusV1.OrderNumberLoadReq) (bonusV1.OrderNumberLoadRes, error) {
 	raw, err := io.ReadAll(req.Data)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при чтении body", zap.Error(err))
+		a.logger.Error(ctx, "Ошибка при чтении body", zap.Error(err))
 		return &bonusV1.OrderNumberLoadBadRequest{}, nil
 	}
 

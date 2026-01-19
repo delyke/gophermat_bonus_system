@@ -17,6 +17,7 @@ type ServiceSuite struct {
 	service              *service
 	userRepository       *mocks.UserRepository
 	withdrawalRepository *mocks.WithdrawalRepository
+	logger               *logger.Logger
 }
 
 func (s *ServiceSuite) SetupTest() {
@@ -24,12 +25,8 @@ func (s *ServiceSuite) SetupTest() {
 	s.bonusRepository = mocks.NewBonusRepository(s.T())
 	s.userRepository = mocks.NewUserRepository(s.T())
 	s.withdrawalRepository = mocks.NewWithdrawalRepository(s.T())
-	s.service = NewService(s.bonusRepository)
-	err := logger.Init(
-		"debug",
-		true,
-	)
-	s.Require().NoError(err)
+	s.logger = logger.NewNop()
+	s.service = NewService(s.bonusRepository, s.logger)
 }
 
 func (s *ServiceSuite) TearDownTest() {}

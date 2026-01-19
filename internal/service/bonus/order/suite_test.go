@@ -23,6 +23,7 @@ type ServiceSuite struct {
 	service         *service
 	faker           *gofakeit.Faker
 	orderRepository *mocks.OrderRepository
+	logger          *logger.Logger
 }
 
 func (s *ServiceSuite) SetupTest() {
@@ -30,13 +31,9 @@ func (s *ServiceSuite) SetupTest() {
 	s.bonusRepository = mocks.NewBonusRepository(s.T())
 	s.accrualWorker = workerMocks.NewAccrualWorker(s.T())
 	s.orderRepository = mocks.NewOrderRepository(s.T())
-	s.service = NewService(s.bonusRepository, s.accrualWorker)
+	s.logger = logger.NewNop()
+	s.service = NewService(s.bonusRepository, s.accrualWorker, s.logger)
 	s.faker = gofakeit.New(0)
-	err := logger.Init(
-		"debug",
-		true,
-	)
-	s.Require().NoError(err)
 }
 
 func (s *ServiceSuite) TearDownTest() {}

@@ -5,7 +5,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
 )
@@ -25,7 +24,7 @@ func (repo *repository) Create(ctx context.Context, withdrawal *model.Withdrawal
 
 	err = repo.pool.QueryRow(ctx, query, args...).Scan(&withdrawal.UUID)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при вставке нового вывода")
+		repo.logger.Error(ctx, "Ошибка при вставке нового вывода")
 		return err
 	}
 

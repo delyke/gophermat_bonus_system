@@ -2,12 +2,10 @@ package logger
 
 import (
 	"context"
-	"os"
-	"strings"
-	"sync"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
+	"strings"
 )
 
 type Key string
@@ -17,46 +15,44 @@ const (
 	userIDKey  Key = "user_id"
 )
 
-// Глобальный singleton логгер
-var (
-	globalLogger *logger
-	initOnce     sync.Once
+// Logger обертка над zap.Logger с enrich поддержкой контекста
+type Logger struct {
+	zapLogger    *zap.Logger
 	dynamicLevel zap.AtomicLevel
-)
-
-// logger обёртка над zap.Logger с enrich поддержкой контекста
-type logger struct {
-	zapLogger *zap.Logger
 }
 
-// Init инициализирует глобальный логгер.
-func Init(levelStr string, asJSON bool) error {
-	initOnce.Do(func() {
-		dynamicLevel = zap.NewAtomicLevelAt(parseLevel(levelStr))
+// New создает новый logger с заданными настройками
+func New(levelStr string, asJSON bool) (*Logger, error) {
+	dynamicLevel := zap.NewAtomicLevelAt(parseLevel(levelStr))
 
-		encoderCfg := buildProductionEncoderConfig()
+	encoderCfg := buildProductionEncoderConfig()
 
-		var encoder zapcore.Encoder
-		if asJSON {
-			encoder = zapcore.NewJSONEncoder(encoderCfg)
-		} else {
-			encoder = zapcore.NewConsoleEncoder(encoderCfg)
-		}
+	var encoder zapcore.Encoder
+	if asJSON {
+		encoder = zapcore.NewJSONEncoder(encoderCfg)
+	} else {
+		encoder = zapcore.NewConsoleEncoder(encoderCfg)
+	}
 
-		core := zapcore.NewCore(
-			encoder,
-			zapcore.AddSync(os.Stdout),
-			dynamicLevel,
-		)
+	core := zapcore.NewCore(
+		encoder,
+		zapcore.AddSync(os.Stdout),
+		dynamicLevel,
+	)
 
-		zapLogger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
+	zapLogger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
 
-		globalLogger = &logger{
-			zapLogger: zapLogger,
-		}
-	})
+	return &Logger{
+		zapLogger:    zapLogger,
+		dynamicLevel: dynamicLevel,
+	}, nil
+}
 
-	return nil
+// NewNop создаёт no-op логгер.
+func NewNop() *Logger {
+	return &Logger{
+		zapLogger: zap.NewNop(),
+	}
 }
 
 func buildProductionEncoderConfig() zapcore.EncoderConfig {
@@ -77,106 +73,85 @@ func buildProductionEncoderConfig() zapcore.EncoderConfig {
 }
 
 // SetLevel динамически меняет уровень логирования
-func SetLevel(levelStr string) {
-	if dynamicLevel == (zap.AtomicLevel{}) {
+func (l *Logger) SetLevel(levelStr string) {
+	if l == nil || l.dynamicLevel == (zap.AtomicLevel{}) {
 		return
 	}
-
-	dynamicLevel.SetLevel(parseLevel(levelStr))
-}
-
-// logger возвращает глобальный enrich-aware логгер
-func Logger() *logger {
-	return globalLogger
-}
-
-// NopLogger устанавливает глобальный логгер в no-op режим.
-// Идеально для юнит-тестов.
-func SetNopLogger() {
-	globalLogger = &logger{
-		zapLogger: zap.NewNop(),
-	}
+	l.dynamicLevel.SetLevel(parseLevel(levelStr))
 }
 
 // Sync сбрасывает буферы логгера
-func Sync() error {
-	if globalLogger != nil {
-		return globalLogger.zapLogger.Sync()
+func (l *Logger) Sync() error {
+	if l == nil || l.zapLogger == nil {
+		return nil
 	}
 
-	return nil
+	return l.zapLogger.Sync()
 }
 
 // With создает новый enrich-aware логгер с дополнительными полями
-func With(fields ...zap.Field) *logger {
-	if globalLogger == nil {
-		return &logger{zapLogger: zap.NewNop()}
+func (l *Logger) With(fields ...zap.Field) *Logger {
+	if l == nil {
+		return nil
 	}
-
-	return &logger{
-		zapLogger: globalLogger.zapLogger.With(fields...),
+	return &Logger{
+		zapLogger:    l.zapLogger.With(fields...),
+		dynamicLevel: l.dynamicLevel,
 	}
 }
 
 // WithContext создает enrich-aware логгер с контекстом
-func WithContext(ctx context.Context) *logger {
-	if globalLogger == nil {
-		return &logger{zapLogger: zap.NewNop()}
+func (l *Logger) WithContext(ctx context.Context) *Logger {
+	if l == nil {
+		return NewNop()
 	}
-
-	return &logger{
-		zapLogger: globalLogger.zapLogger.With(fieldsFromContext(ctx)...),
+	return &Logger{
+		zapLogger:    l.zapLogger.With(fieldsFromContext(ctx)...),
+		dynamicLevel: l.dynamicLevel,
 	}
 }
 
-// Debug enrich-aware debug log
-func Debug(ctx context.Context, msg string, fields ...zap.Field) {
-	globalLogger.Debug(ctx, msg, fields...)
-}
-
-// Info enrich-aware info log
-func Info(ctx context.Context, msg string, fields ...zap.Field) {
-	globalLogger.Info(ctx, msg, fields...)
-}
-
-// Warn enrich-aware warn log
-func Warn(ctx context.Context, msg string, fields ...zap.Field) {
-	globalLogger.Warn(ctx, msg, fields...)
-}
-
-// Error enrich-aware error log
-func Error(ctx context.Context, msg string, fields ...zap.Field) {
-	globalLogger.Error(ctx, msg, fields...)
-}
-
-// Fatal enrich-aware fatal log
-func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
-	globalLogger.Fatal(ctx, msg, fields...)
-}
-
-// Instance methods для enrich loggers (logger)
-
-func (l *logger) Debug(ctx context.Context, msg string, fields ...zap.Field) {
+// Debug enrich-aware debug log.
+func (l *Logger) Debug(ctx context.Context, msg string, fields ...zap.Field) {
+	if l == nil {
+		return
+	}
 	allFields := append(fieldsFromContext(ctx), fields...)
 	l.zapLogger.Debug(msg, allFields...)
 }
 
-func (l *logger) Info(ctx context.Context, msg string, fields ...zap.Field) {
+// Info enrich-aware info log.
+func (l *Logger) Info(ctx context.Context, msg string, fields ...zap.Field) {
+	if l == nil {
+		return
+	}
 	allFields := append(fieldsFromContext(ctx), fields...)
 	l.zapLogger.Info(msg, allFields...)
 }
 
-func (l *logger) Warn(ctx context.Context, msg string, fields ...zap.Field) {
+// Warn enrich-aware warn log.
+func (l *Logger) Warn(ctx context.Context, msg string, fields ...zap.Field) {
+	if l == nil {
+		return
+	}
 	allFields := append(fieldsFromContext(ctx), fields...)
 	l.zapLogger.Warn(msg, allFields...)
 }
 
-func (l *logger) Error(ctx context.Context, msg string, fields ...zap.Field) {
+// Error enrich-aware error log.
+func (l *Logger) Error(ctx context.Context, msg string, fields ...zap.Field) {
+	if l == nil {
+		return
+	}
 	allFields := append(fieldsFromContext(ctx), fields...)
 	l.zapLogger.Error(msg, allFields...)
 }
 
-func (l *logger) Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+// Fatal enrich-aware fatal log.
+func (l *Logger) Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+	if l == nil {
+		return
+	}
 	allFields := append(fieldsFromContext(ctx), fields...)
 	l.zapLogger.Fatal(msg, allFields...)
 }

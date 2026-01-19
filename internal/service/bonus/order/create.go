@@ -8,20 +8,19 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/delyke/gophermat_bonus_system/internal/authctx"
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/luhn"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 )
 
 func (s *service) Create(ctx context.Context, orderID []byte) (string, error) {
-	logger.Debug(ctx, "readed order id:", zap.String("orderId", string(orderID)))
+	s.logger.Debug(ctx, "readed order id:", zap.String("orderId", string(orderID)))
 	isValid, err := luhn.Validate(orderID)
 	if err != nil {
-		logger.Error(ctx, "ошибка при валидации по алгоритму Луна", zap.Error(err))
+		s.logger.Error(ctx, "ошибка при валидации по алгоритму Луна", zap.Error(err))
 		return "", model.ErrBadCredentials
 	}
 	if !isValid {
-		logger.Debug(ctx, "номер заказа не валидный", zap.String("orderId", string(orderID)))
+		s.logger.Debug(ctx, "номер заказа не валидный", zap.String("orderId", string(orderID)))
 		return "", model.ErrOrderIDLuhnInvalid
 	}
 

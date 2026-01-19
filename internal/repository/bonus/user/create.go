@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	"github.com/delyke/gophermat_bonus_system/internal/postgres"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
@@ -38,7 +37,7 @@ func (repo *repository) Create(ctx context.Context, login, password string) (*mo
 		if postgres.IsUniqueViolation(err) {
 			return nil, model.ErrLoginTaken
 		}
-		logger.Error(ctx, "[REGISTRATION] Failed to create user:", zap.Error(err))
+		repo.logger.Error(ctx, "[REGISTRATION] Failed to create user:", zap.Error(err))
 		return nil, err
 	}
 

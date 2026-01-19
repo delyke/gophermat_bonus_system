@@ -25,6 +25,7 @@ type AccrualProcessor struct {
 
 	repo          repository.BonusRepository
 	accrualClient *accrualV1.Client
+	logger        *logger.Logger
 
 	stopped atomic.Bool
 	wg      sync.WaitGroup
@@ -35,6 +36,7 @@ type AccrualProcessor struct {
 
 func NewAccrualProcessor(
 	ctx context.Context,
+	appLogger *logger.Logger,
 	repo repository.BonusRepository,
 	accrualClient *accrualV1.Client,
 	workers int,
@@ -46,6 +48,7 @@ func NewAccrualProcessor(
 		semaphore:     make(chan struct{}, workers),
 		repo:          repo,
 		accrualClient: accrualClient,
+		logger:        appLogger,
 		cancel:        cancel,
 		ctx:           ctx,
 	}
@@ -79,7 +82,7 @@ func (p *AccrualProcessor) Bootstrap(ctx context.Context) error {
 			return ctx.Err()
 		}
 	}
-	logger.Info(ctx, fmt.Sprintf("Accrual Воркер поднялся, взято в работу %d заказов", len(jobs)), zap.Int("count", len(jobs)))
+	p.logger.Info(ctx, fmt.Sprintf("Accrual Воркер поднялся, взято в работу %d заказов", len(jobs)), zap.Int("count", len(jobs)))
 	return nil
 }
 
@@ -172,7 +175,7 @@ func (p *AccrualProcessor) process(ctx context.Context, j model.OrderJob) {
 	if j.OrderStatus != model.OrderProcessing {
 		err := p.repo.Orders().SetStatusByUUID(ctx, j.OrderUUID, model.OrderProcessing)
 		if err != nil {
-			logger.Error(ctx, "Ошибка при установке статуса для заказа", zap.Error(err))
+			p.logger.Error(ctx, "Ошибка при установке статуса для заказа", zap.Error(err))
 			return
 		}
 		j.OrderStatus = model.OrderProcessing
@@ -182,7 +185,7 @@ func (p *AccrualProcessor) process(ctx context.Context, j model.OrderJob) {
 		Number: j.OrderNumber,
 	})
 	if err != nil {
-		logger.Error(ctx, "[ACCRUAL] Ошибка получения информации о заказе при получении - попробуем чуть позже", zap.Error(err))
+		p.logger.Error(ctx, "[ACCRUAL] Ошибка получения информации о заказе при получении - попробуем чуть позже", zap.Error(err))
 		p.backoffWithJitter(&j)
 		return
 	}
@@ -219,7 +222,7 @@ func (p *AccrualProcessor) process(ctx context.Context, j model.OrderJob) {
 }
 
 func (p *AccrualProcessor) internalServerHandler(ctx context.Context, j *model.OrderJob) {
-	logger.Debug(ctx, "На сервере accrual произошла ошибка, отправляем в работу еще раз...")
+	p.logger.Debug(ctx, "На сервере accrual произошла ошибка, отправляем в работу еще раз...")
 	p.backoffWithJitter(j)
 }
 
@@ -233,7 +236,7 @@ func (p *AccrualProcessor) tooManyRequestsHandler(ctx context.Context, j *model.
 	}
 	p.rateMu.Unlock()
 
-	logger.Warn(ctx, "Пришел Rate Limit, ставим на стоп воркеров",
+	p.logger.Warn(ctx, "Пришел Rate Limit, ставим на стоп воркеров",
 		zap.Duration("retry_after", retryAfter))
 	p.backoffWithJitter(j)
 }
@@ -246,58 +249,58 @@ func (p *AccrualProcessor) backoffWithJitter(j *model.OrderJob) {
 }
 
 func (p *AccrualProcessor) orderUndefinedResponseProcessing(ctx context.Context, j *model.OrderJob, v *accrualV1.GetOrderInfoResponse) {
-	logger.Debug(ctx, "Пришел неизвестный статус от системы начисления...", zap.Any("status", v.Status))
+	p.logger.Debug(ctx, "Пришел неизвестный статус от системы начисления...", zap.Any("status", v.Status))
 	p.backoffWithJitter(j)
 }
 
 func (p *AccrualProcessor) orderProcessingResponseProcessing(ctx context.Context, j *model.OrderJob) {
-	logger.Debug(ctx, "Расчет начисления в процессе, отправляем в работу еще раз немного позже...")
+	p.logger.Debug(ctx, "Расчет начисления в процессе, отправляем в работу еще раз немного позже...")
 	p.backoffWithJitter(j)
 }
 
 func (p *AccrualProcessor) orderRegisteredResponseProcessing(ctx context.Context, j *model.OrderJob) {
-	logger.Debug(ctx, "Заказ зарегистрирован, отправляем в работу еще раз...")
+	p.logger.Debug(ctx, "Заказ зарегистрирован, отправляем в работу еще раз...")
 	p.backoffWithJitter(j)
 }
 
 func (p *AccrualProcessor) orderNoContentProcessing(ctx context.Context, j *model.OrderJob) {
-	logger.Debug(ctx, "accrual: 204 no content, retry later")
+	p.logger.Debug(ctx, "accrual: 204 no content, retry later")
 	p.backoffWithJitter(j)
 }
 
 func (p *AccrualProcessor) orderInvalidResponseProcessing(ctx context.Context, j *model.OrderJob, v *accrualV1.GetOrderInfoResponse) {
 	err := p.repo.Orders().SetStatusByUUID(ctx, j.OrderUUID, model.OrderInvalid)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при установке статуса заказа", zap.Error(err))
+		p.logger.Error(ctx, "Ошибка при установке статуса заказа", zap.Error(err))
 		return
 	}
-	logger.Debug(ctx, fmt.Sprintf("Заказ %s обработан со статусом %s", j.OrderNumber, v.Status))
+	p.logger.Debug(ctx, fmt.Sprintf("Заказ %s обработан со статусом %s", j.OrderNumber, v.Status))
 }
 
 func (p *AccrualProcessor) orderProcessedResponseProcessing(ctx context.Context, j *model.OrderJob, v *accrualV1.GetOrderInfoResponse) {
 	err := p.repo.Orders().SetStatusByUUID(ctx, j.OrderUUID, model.OrderProcessed)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при установке статуса начисленного вознаграждения", zap.Error(err))
+		p.logger.Error(ctx, "Ошибка при установке статуса начисленного вознаграждения", zap.Error(err))
 		return
 	}
 	accrual := converter.OptFloat64ToFloat64(v.Accrual)
 	if accrual != nil {
 		err = p.repo.Orders().SetAccrualByUUID(ctx, j.OrderUUID, *accrual)
 		if err != nil {
-			logger.Error(ctx, "Ошибка при установке вознаграждения", zap.Error(err))
+			p.logger.Error(ctx, "Ошибка при установке вознаграждения", zap.Error(err))
 			return
 		}
 	}
 	balance, err := p.repo.Users().GetBalanceByUUID(ctx, j.UserID)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при запросе баланса пользователя", zap.Error(err))
+		p.logger.Error(ctx, "Ошибка при запросе баланса пользователя", zap.Error(err))
 		return
 	}
 	balance += *accrual
 
 	err = p.repo.Users().SetBalanceByUUID(ctx, j.UserID, balance)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при установке баланса пользователю", zap.Error(err))
+		p.logger.Error(ctx, "Ошибка при установке баланса пользователю", zap.Error(err))
 		return
 	}
 }

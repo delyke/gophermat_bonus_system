@@ -25,6 +25,7 @@ type ServiceSuite struct {
 	userRepository       *mocks.UserRepository
 	tokenIssuer          *serviceMocks.TokenIssuer
 	withdrawalRepository *mocks.WithdrawalRepository
+	logger               *logger.Logger
 	originalArgs         []string
 }
 
@@ -34,17 +35,13 @@ func (s *ServiceSuite) SetupTest() {
 	s.accrualWorker = workerMocks.NewAccrualWorker(s.T())
 	s.userRepository = mocks.NewUserRepository(s.T())
 	s.tokenIssuer = serviceMocks.NewTokenIssuer(s.T())
-	s.service = NewService(s.bonusRepository, s.tokenIssuer)
+	s.logger = logger.NewNop()
+	s.service = NewService(s.bonusRepository, s.tokenIssuer, s.logger)
 	s.withdrawalRepository = mocks.NewWithdrawalRepository(s.T())
 	s.faker = gofakeit.New(0)
 	s.originalArgs = os.Args
 	os.Args = []string{os.Args[0]}
 	err := config.Load()
-	s.Require().NoError(err)
-	err = logger.Init(
-		"debug",
-		true,
-	)
 	s.Require().NoError(err)
 }
 

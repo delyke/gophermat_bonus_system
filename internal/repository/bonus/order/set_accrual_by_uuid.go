@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 )
 
@@ -19,13 +18,13 @@ func (repo *repository) SetAccrualByUUID(ctx context.Context, uuid uuid.UUID, ac
 
 	query, args, err := builderUpdate.ToSql()
 	if err != nil {
-		logger.Error(ctx, "Ошибка при построении запроса на обновление начисленного вознаграждения", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при построении запроса на обновление начисленного вознаграждения", zap.Error(err))
 		return err
 	}
 
 	res, err := repo.pool.Exec(ctx, query, args...)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при записи суммы вознаграждения")
+		repo.logger.Error(ctx, "Ошибка при записи суммы вознаграждения")
 		return err
 	}
 

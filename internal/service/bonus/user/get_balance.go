@@ -6,7 +6,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/delyke/gophermat_bonus_system/internal/authctx"
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 )
 
@@ -17,12 +16,12 @@ func (s *service) GetBalance(ctx context.Context) (float64, float64, error) {
 	}
 	cBalance, err := s.bonusRepository.Users().GetBalanceByUUID(ctx, principal.UserUUID)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при получении баланса пользователя", zap.Error(err))
+		s.logger.Error(ctx, "Ошибка при получении баланса пользователя", zap.Error(err))
 		return 0, 0, err
 	}
 	wBalance, err := s.bonusRepository.Withdrawals().SumAmountByUserUUID(ctx, principal.UserUUID)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при получении суммы выведенных средств", zap.Error(err))
+		s.logger.Error(ctx, "Ошибка при получении суммы выведенных средств", zap.Error(err))
 		return 0, 0, err
 	}
 	return cBalance, wBalance, nil

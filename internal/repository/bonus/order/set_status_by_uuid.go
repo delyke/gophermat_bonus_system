@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
 )
@@ -22,13 +21,13 @@ func (repo *repository) SetStatusByUUID(ctx context.Context, uuid uuid.UUID, sta
 
 	query, args, err := builderUpdate.ToSql()
 	if err != nil {
-		logger.Error(ctx, "Ошибка при построении запроса на обновление статуса заказа", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при построении запроса на обновление статуса заказа", zap.Error(err))
 		return err
 	}
 
 	res, err := repo.pool.Exec(ctx, query, args...)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при обновлении статуса заказа", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при обновлении статуса заказа", zap.Error(err))
 		return err
 	}
 	if res.RowsAffected() == 0 {

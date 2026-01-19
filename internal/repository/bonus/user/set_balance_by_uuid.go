@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 )
 
@@ -19,13 +18,13 @@ func (repo *repository) SetBalanceByUUID(ctx context.Context, userID uuid.UUID, 
 
 	query, args, err := builderUpdate.ToSql()
 	if err != nil {
-		logger.Error(ctx, "Ошибка при построении запроса на обновление баланса пользователя", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при построении запроса на обновление баланса пользователя", zap.Error(err))
 		return err
 	}
 
 	res, err := repo.pool.Exec(ctx, query, args...)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при обновлении баланса", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при обновлении баланса", zap.Error(err))
 		return err
 	}
 

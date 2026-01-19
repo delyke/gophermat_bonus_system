@@ -13,7 +13,7 @@ import (
 )
 
 func TestCloserCloseAllExecutesInReverseOrder(t *testing.T) {
-	c := NewWithLogger(&logger.NoopLogger{})
+	c := NewWithLogger(logger.NewNop())
 	var mu sync.Mutex
 	var order []string
 
@@ -41,7 +41,7 @@ func TestCloserCloseAllExecutesInReverseOrder(t *testing.T) {
 }
 
 func TestCloserCloseAllReturnsFirstError(t *testing.T) {
-	c := NewWithLogger(&logger.NoopLogger{})
+	c := NewWithLogger(logger.NewNop())
 	expectedErr := errors.New("close error")
 
 	c.Add(
@@ -55,7 +55,7 @@ func TestCloserCloseAllReturnsFirstError(t *testing.T) {
 }
 
 func TestCloserCloseAllHandlesPanic(t *testing.T) {
-	c := NewWithLogger(&logger.NoopLogger{})
+	c := NewWithLogger(logger.NewNop())
 	c.Add(func(context.Context) error { panic("boom") })
 
 	err := c.CloseAll(context.Background())
@@ -64,7 +64,7 @@ func TestCloserCloseAllHandlesPanic(t *testing.T) {
 }
 
 func TestCloserCloseAllContextCanceled(t *testing.T) {
-	c := NewWithLogger(&logger.NoopLogger{})
+	c := NewWithLogger(logger.NewNop())
 	c.Add(func(context.Context) error {
 		time.Sleep(20 * time.Millisecond) //nolint:forbidigo
 		return nil
@@ -79,7 +79,7 @@ func TestCloserCloseAllContextCanceled(t *testing.T) {
 }
 
 func TestCloserCloseAllRunsOnce(t *testing.T) {
-	c := NewWithLogger(&logger.NoopLogger{})
+	c := NewWithLogger(logger.NewNop())
 	var mu sync.Mutex
 	count := 0
 

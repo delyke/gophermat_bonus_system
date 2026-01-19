@@ -22,10 +22,11 @@ type App struct {
 	diContainer *diContainer
 	httpServer  *http.Server
 	router      *chi.Mux
+	logger      *logger.Logger
 }
 
-func New(ctx context.Context) (*App, error) {
-	a := &App{}
+func New(ctx context.Context, appLogger *logger.Logger) (*App, error) {
+	a := &App{logger: appLogger}
 
 	err := a.initDeps(ctx)
 	if err != nil {
@@ -37,7 +38,6 @@ func New(ctx context.Context) (*App, error) {
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
 		a.initDI,
-		a.initLogger,
 		a.initMigrator,
 		a.initCloser,
 		a.initWorkers,
@@ -54,19 +54,12 @@ func (a *App) initDeps(ctx context.Context) error {
 }
 
 func (a *App) initDI(_ context.Context) error {
-	a.diContainer = NewDIContainer()
+	a.diContainer = NewDIContainer(a.logger)
 	return nil
 }
 
-func (a *App) initLogger(_ context.Context) error {
-	return logger.Init(
-		config.Get().Logger.Level(),
-		config.Get().Logger.AsJSON(),
-	)
-}
-
 func (a *App) initCloser(_ context.Context) error {
-	closer.SetLogger(logger.Logger())
+	closer.SetLogger(a.logger)
 	return nil
 }
 
@@ -76,12 +69,12 @@ func (a *App) initMigrator(ctx context.Context) error {
 		return err
 	}
 
-	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*poolCfg.ConnConfig), config.Get().Postgres.MigrationDirectory())
+	migratorRunner := migrator.NewMigrator(stdlib.OpenDB(*poolCfg.ConnConfig), config.Get().Postgres.MigrationDirectory(), a.logger)
 	err = migratorRunner.Up(ctx)
 	if err != nil {
 		return err
 	}
-	logger.Info(ctx, "migrations applied")
+	a.logger.Info(ctx, "migrations applied")
 	return nil
 }
 
@@ -115,7 +108,7 @@ func (a *App) initWorkers(ctx context.Context) error {
 }
 
 func (a *App) runHTTPServer(ctx context.Context) error {
-	logger.Info(ctx, "starting http server", zap.String("RunAddress:", config.Get().HTTP.RunAddress()))
+	a.logger.Info(ctx, "starting http server", zap.String("RunAddress:", config.Get().HTTP.RunAddress()))
 	closer.AddNamed("HTTP Server", func(ctx context.Context) error {
 		return a.httpServer.Shutdown(ctx)
 	})
@@ -131,25 +124,25 @@ func (a *App) Run(ctx context.Context) error {
 }
 
 func (a *App) ShowConfig(ctx context.Context) error {
-	logger.Debug(ctx, "App configuration:", zap.Any("config", config.Get()))
-	logger.Debug(ctx,
+	a.logger.Debug(ctx, "App configuration:", zap.Any("config", config.Get()))
+	a.logger.Debug(ctx,
 		"Logger config:",
 		zap.Any("asJson", config.Get().Logger.AsJSON()),
 		zap.Any("level", config.Get().Logger.Level()),
 	)
 
-	logger.Debug(ctx,
+	a.logger.Debug(ctx,
 		"Accrual config:",
 		zap.Any("SystemAddress", config.Get().Accrual.SystemAddress()),
 	)
 
-	logger.Debug(ctx,
+	a.logger.Debug(ctx,
 		"Bonus HTTP Config:",
 		zap.String("RunAddress:", config.Get().HTTP.RunAddress()),
 		zap.Any("ReadTimeout:", config.Get().HTTP.ReadTimeout()),
 	)
 
-	logger.Debug(ctx,
+	a.logger.Debug(ctx,
 		"PostgresConfig:",
 		zap.String("host", config.Get().Postgres.Host()),
 		zap.Int("port", config.Get().Postgres.Port()),
@@ -161,7 +154,7 @@ func (a *App) ShowConfig(ctx context.Context) error {
 		zap.String("Migrations dir", config.Get().Postgres.MigrationDirectory()),
 	)
 
-	logger.Debug(ctx,
+	a.logger.Debug(ctx,
 		"JWT Config:",
 		zap.Any("Secret", config.Get().JWT.Secret()))
 	return nil

@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/delyke/gophermat_bonus_system/internal/logger"
 	"github.com/delyke/gophermat_bonus_system/internal/model"
 	"github.com/delyke/gophermat_bonus_system/internal/repository/converter"
 	repoModel "github.com/delyke/gophermat_bonus_system/internal/repository/model"
@@ -29,13 +28,13 @@ func (repo *repository) ListByUserByDateDesc(ctx context.Context, userUUID uuid.
 
 	query, args, err := builderSelect.ToSql()
 	if err != nil {
-		logger.Error(ctx, "Ошибка при построении запроса на получение списка выводов", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при построении запроса на получение списка выводов", zap.Error(err))
 		return nil, err
 	}
 
 	rows, err := repo.pool.Query(ctx, query, args...)
 	if err != nil {
-		logger.Error(ctx, "Ошибка при выборке списка выводов", zap.Error(err))
+		repo.logger.Error(ctx, "Ошибка при выборке списка выводов", zap.Error(err))
 		return nil, err
 	}
 	defer rows.Close()
@@ -52,7 +51,7 @@ func (repo *repository) ListByUserByDateDesc(ctx context.Context, userUUID uuid.
 	for rows.Next() {
 		err = rows.Scan(&gID, &gUserUUID, &gOrderID, &gAmount, &gProcessedAt)
 		if err != nil {
-			logger.Error(ctx, "Ошибка при сканировании выданных данных в Repo Withdrawal", zap.Error(err))
+			repo.logger.Error(ctx, "Ошибка при сканировании выданных данных в Repo Withdrawal", zap.Error(err))
 			return nil, err
 		}
 		withdrawals = append(withdrawals, &repoModel.Withdrawal{
