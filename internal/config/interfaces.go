@@ -32,3 +32,7 @@ type JWTConfig interface {
 	Secret() string
 	TTL() time.Duration
 }
+
+type AppConfig interface {
+	ShutdownTimeout() time.Duration
+}

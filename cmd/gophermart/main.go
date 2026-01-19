@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"go.uber.org/zap"
 
@@ -29,24 +27,24 @@ func main() {
 
 	a, err := app.New(appCtx)
 	if err != nil {
-		log.Println(err)
+		logger.Fatal(appCtx, "error starting application", zap.Error(err))
 		return
 	}
 	err = a.ShowConfig(appCtx)
 	if err != nil {
-		log.Println(err)
+		logger.Fatal(appCtx, "error showing config", zap.Error(err))
 		return
 	}
 
 	err = a.Run(appCtx)
 	if err != nil {
-		log.Println(err)
+		logger.Fatal(appCtx, "error running app", zap.Error(err))
 		return
 	}
 }
 
 func gracefulShutdown() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), config.Get().App.ShutdownTimeout())
 	defer cancel()
 
 	if err := closer.CloseAll(ctx); err != nil {

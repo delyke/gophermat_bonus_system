@@ -1,5 +1,7 @@
 package defaults
 
+import "time"
+
 // Logger defaults
 var (
 	LoggerLogLevel = "debug"
@@ -33,4 +35,10 @@ var (
 var (
 	JWTSecret = "bonus-service-jwt-secret"
 	JWTTTL    = "1d"
+)
+
+// App Defaults
+var (
+	// AppShutdownDuration - maximal time duration for graceful shutdown
+	AppShutdownDuration = 30 * time.Second
 )
