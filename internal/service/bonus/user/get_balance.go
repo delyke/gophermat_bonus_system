@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 
 	"go.uber.org/zap"
 
@@ -22,7 +23,7 @@ func (s *service) GetBalance(ctx context.Context) (float64, float64, error) {
 	wBalance, err := s.bonusRepository.Withdrawals().SumAmountByUserUUID(ctx, principal.UserUUID)
 	if err != nil {
 		s.logger.Error(ctx, "Ошибка при получении суммы выведенных средств", zap.Error(err))
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("getting sum withdrawals by user error: %w", err)
 	}
 	return cBalance, wBalance, nil
 }

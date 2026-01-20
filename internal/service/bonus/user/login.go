@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -12,7 +13,7 @@ import (
 // Login - Проводит аутентификацию по паре логин / пароль
 func (s *service) Login(ctx context.Context, username, password string) (string, error) {
 	if username == "" && password == "" {
-		return "", model.ErrBadCredentials
+		return "", fmt.Errorf("username or password is empty: %w", model.ErrBadCredentials)
 	}
 
 	user, err := s.bonusRepository.Users().GetByLogin(ctx, username)

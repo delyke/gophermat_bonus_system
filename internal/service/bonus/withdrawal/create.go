@@ -2,6 +2,7 @@ package withdrawal
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.uber.org/zap"
@@ -19,7 +20,7 @@ func (s *service) Create(ctx context.Context, orderID []byte, sum float64) error
 	isValid, err := luhn.Validate(orderID)
 	if err != nil {
 		s.logger.Error(ctx, "ошибка при валидации по алгоритму Луна", zap.Error(err))
-		return model.ErrBadCredentials
+		return model.ErrOrderIDLuhnInvalid
 	}
 	if !isValid {
 		s.logger.Debug(ctx, "номер заказа не валидный", zap.String("orderId", string(orderID)))
@@ -35,7 +36,7 @@ func (s *service) Create(ctx context.Context, orderID []byte, sum float64) error
 
 	err = s.bonusRepository.CreateWithdrawalWithBalance(ctx, withdrawal)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create user withdrawal: %w", err)
 	}
 	return nil
 }

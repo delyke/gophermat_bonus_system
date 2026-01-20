@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS orders(
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_user_uuid ON orders(user_uuid);
+CREATE UNIQUE INDEX idx_orders_number_unique
+    ON orders(order_id);
 
 -- +goose Down
 DROP TABLE IF EXISTS orders;

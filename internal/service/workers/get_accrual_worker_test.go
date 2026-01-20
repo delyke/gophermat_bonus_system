@@ -225,9 +225,8 @@ func TestTooManyRequestsHandlerUpdatesRateLimit(t *testing.T) {
 	job := model.OrderJob{}
 	worker.tooManyRequestsHandler(context.Background(), &job, resp)
 
-	worker.rateMu.Lock()
-	defer worker.rateMu.Unlock()
-	require.True(t, worker.rateUntil.After(now.Add(time.Duration(retry-1)*time.Second)))
+	rateUntil := time.Unix(0, worker.rateUntil.Load())
+	require.True(t, rateUntil.After(now.Add(time.Duration(retry-1)*time.Second)))
 }
 
 func TestInternalServerHandlerIncrementsAttempts(t *testing.T) {

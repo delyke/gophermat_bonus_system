@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -11,7 +12,7 @@ import (
 
 // Register - создает хэш пароля, записывает логин и пароль в БД и выдает токен
 func (s *service) Register(ctx context.Context, login, password string) (string, error) {
-	if login == "" || password == "" {
+	if login == "" || password == "" || !isPasswordComplex(password) {
 		return "", model.ErrBadCredentials
 	}
 
@@ -35,4 +36,28 @@ func (s *service) Register(ctx context.Context, login, password string) (string,
 	}
 
 	return tok, nil
+}
+
+func isPasswordComplex(password string) bool {
+	const minLength = 8
+	if len(password) < minLength {
+		return false
+	}
+
+	var hasLower bool
+	var hasUpper bool
+	var hasDigit bool
+
+	for _, r := range password {
+		switch {
+		case unicode.IsLower(r):
+			hasLower = true
+		case unicode.IsUpper(r):
+			hasUpper = true
+		case unicode.IsDigit(r):
+			hasDigit = true
+		}
+	}
+
+	return hasLower && hasUpper && hasDigit
 }

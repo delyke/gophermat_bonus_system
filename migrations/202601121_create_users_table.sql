@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
     balance NUMERIC(14,2) NOT NULL DEFAULT 0
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_by_password ON users(login, password);
+CREATE UNIQUE INDEX idx_users_login_unique
+    ON users(login);
 
 -- +goose Down
 DROP TABLE IF EXISTS users;

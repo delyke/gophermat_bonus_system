@@ -20,8 +20,7 @@ type AccrualProcessor struct {
 	jobs      chan model.OrderJob
 	semaphore chan struct{}
 
-	rateMu    sync.Mutex
-	rateUntil time.Time
+	rateUntil atomic.Int64
 
 	repo          repository.BonusRepository
 	accrualClient *accrualV1.Client
@@ -32,6 +31,13 @@ type AccrualProcessor struct {
 	cancel  context.CancelFunc
 
 	ctx context.Context //nolint:containedctx
+}
+
+func (p *AccrualProcessor) retryAfterDuration(v *accrualV1.GetOrderInfoTooManyRequestsHeaders) time.Duration {
+	if v == nil {
+		return 0
+	}
+	return time.Duration(v.RetryAfter.Value) * time.Second
 }
 
 func NewAccrualProcessor(
@@ -145,9 +151,11 @@ func (p *AccrualProcessor) run(ctx context.Context) {
 
 // waitIfRateLimited - функция, которая замораживает воркеров, если во внешней системе rate limit
 func (p *AccrualProcessor) waitIfRateLimited(ctx context.Context) {
-	p.rateMu.Lock()
-	until := p.rateUntil
-	p.rateMu.Unlock()
+	untilUnix := p.rateUntil.Load()
+	if untilUnix == 0 {
+		return
+	}
+	until := time.Unix(0, untilUnix)
 
 	now := time.Now()
 	if !now.Before(until) {
@@ -227,14 +235,20 @@ func (p *AccrualProcessor) internalServerHandler(ctx context.Context, j *model.O
 }
 
 func (p *AccrualProcessor) tooManyRequestsHandler(ctx context.Context, j *model.OrderJob, v *accrualV1.GetOrderInfoTooManyRequestsHeaders) {
-	retryAfter := time.Duration(v.RetryAfter.Value) * time.Second
+	retryAfter := p.retryAfterDuration(v)
 
-	p.rateMu.Lock()
 	until := time.Now().Add(retryAfter)
-	if until.After(p.rateUntil) {
-		p.rateUntil = until
+
+	untilUnix := until.UnixNano()
+	for {
+		current := p.rateUntil.Load()
+		if untilUnix <= current {
+			break
+		}
+		if p.rateUntil.CompareAndSwap(current, untilUnix) {
+			break
+		}
 	}
-	p.rateMu.Unlock()
 
 	p.logger.Warn(ctx, "Пришел Rate Limit, ставим на стоп воркеров",
 		zap.Duration("retry_after", retryAfter))
