@@ -27,7 +27,7 @@ func (s *ServiceSuite) TestCreateLuhnValidateError() {
 	err := s.service.Create(s.ctx, []byte("g495599"), 100)
 
 	s.Require().Error(err)
-	s.Require().ErrorIs(err, model.ErrBadCredentials)
+	s.Require().ErrorIs(err, model.ErrOrderIDLuhnInvalid)
 }
 
 func (s *ServiceSuite) TestCreateLuhnInvalid() {

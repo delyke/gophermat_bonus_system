@@ -8,6 +8,8 @@ import (
 	model "github.com/delyke/gophermat_bonus_system/internal/model"
 	mock "github.com/stretchr/testify/mock"
 
+	time "time"
+
 	uuid "github.com/google/uuid"
 )
 
@@ -256,6 +258,67 @@ func (_c *OrderRepository_ListPending_Call) Return(_a0 []*model.Order, _a1 error
 }
 
 func (_c *OrderRepository_ListPending_Call) RunAndReturn(run func(context.Context, uint64) ([]*model.Order, error)) *OrderRepository_ListPending_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListPendingAfter provides a mock function with given fields: ctx, limit, afterUploadedAt, afterUUID
+func (_m *OrderRepository) ListPendingAfter(ctx context.Context, limit uint64, afterUploadedAt time.Time, afterUUID uuid.UUID) ([]*model.Order, error) {
+	ret := _m.Called(ctx, limit, afterUploadedAt, afterUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListPendingAfter")
+	}
+
+	var r0 []*model.Order
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint64, time.Time, uuid.UUID) ([]*model.Order, error)); ok {
+		return rf(ctx, limit, afterUploadedAt, afterUUID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint64, time.Time, uuid.UUID) []*model.Order); ok {
+		r0 = rf(ctx, limit, afterUploadedAt, afterUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.Order)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint64, time.Time, uuid.UUID) error); ok {
+		r1 = rf(ctx, limit, afterUploadedAt, afterUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// OrderRepository_ListPendingAfter_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListPendingAfter'
+type OrderRepository_ListPendingAfter_Call struct {
+	*mock.Call
+}
+
+// ListPendingAfter is a helper method to define mock.On call
+//   - ctx context.Context
+//   - limit uint64
+//   - afterUploadedAt time.Time
+//   - afterUUID uuid.UUID
+func (_e *OrderRepository_Expecter) ListPendingAfter(ctx interface{}, limit interface{}, afterUploadedAt interface{}, afterUUID interface{}) *OrderRepository_ListPendingAfter_Call {
+	return &OrderRepository_ListPendingAfter_Call{Call: _e.mock.On("ListPendingAfter", ctx, limit, afterUploadedAt, afterUUID)}
+}
+
+func (_c *OrderRepository_ListPendingAfter_Call) Run(run func(ctx context.Context, limit uint64, afterUploadedAt time.Time, afterUUID uuid.UUID)) *OrderRepository_ListPendingAfter_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uint64), args[2].(time.Time), args[3].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *OrderRepository_ListPendingAfter_Call) Return(_a0 []*model.Order, _a1 error) *OrderRepository_ListPendingAfter_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OrderRepository_ListPendingAfter_Call) RunAndReturn(run func(context.Context, uint64, time.Time, uuid.UUID) ([]*model.Order, error)) *OrderRepository_ListPendingAfter_Call {
 	_c.Call.Return(run)
 	return _c
 }

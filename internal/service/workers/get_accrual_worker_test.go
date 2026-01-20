@@ -47,14 +47,17 @@ func TestBootstrapEnqueuesJobs(t *testing.T) {
 
 	orderUUID := uuid.New()
 	userUUID := uuid.New()
-	orderRepo.On("ListPending", mock.Anything, uint64(1000)).Return([]*model.Order{
+	uploadedAt := time.Now().UTC()
+	orderRepo.On("ListPendingAfter", mock.Anything, uint64(1000), time.Time{}, uuid.Nil).Return([]*model.Order{
 		{
-			UUID:     orderUUID,
-			UserUUID: userUUID,
-			OrderID:  "20000006",
-			Status:   model.OrderNew,
+			UUID:       orderUUID,
+			UserUUID:   userUUID,
+			OrderID:    "20000006",
+			Status:     model.OrderNew,
+			UploadedAt: uploadedAt,
 		},
 	}, nil)
+	orderRepo.On("ListPendingAfter", mock.Anything, uint64(1000), uploadedAt, orderUUID).Return([]*model.Order{}, nil)
 
 	worker := &AccrualProcessor{
 		jobs:          make(chan model.OrderJob, 1),

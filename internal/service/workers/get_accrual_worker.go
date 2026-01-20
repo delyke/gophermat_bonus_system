@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 
 	"github.com/delyke/gophermat_bonus_system/internal/api/accrual/converter"
@@ -21,6 +22,10 @@ type AccrualProcessor struct {
 	semaphore chan struct{}
 
 	rateUntil atomic.Int64
+
+	pendingCursorMu   sync.Mutex
+	pendingCursorTime time.Time
+	pendingCursorUUID uuid.UUID
 
 	repo          repository.BonusRepository
 	accrualClient *accrualV1.Client
@@ -68,27 +73,13 @@ func NewAccrualProcessor(
 func (p *AccrualProcessor) Bootstrap(ctx context.Context) error {
 	const limit = 1000
 
-	jobs, err := p.repo.Orders().ListPending(ctx, limit)
+	orders, err := p.drainPending(ctx, limit, false)
 	if err != nil {
 		return err
 	}
 
-	for _, j := range jobs {
-		job := model.OrderJob{
-			UserID:      j.UserUUID,
-			OrderUUID:   j.UUID,
-			OrderNumber: j.OrderID,
-			OrderStatus: j.Status,
-			Attempts:    0,
-		}
-
-		select {
-		case p.jobs <- job:
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-	p.logger.Info(ctx, fmt.Sprintf("Accrual Воркер поднялся, взято в работу %d заказов", len(jobs)), zap.Int("count", len(jobs)))
+	go p.pollPending(ctx, limit, 2*time.Second)
+	p.logger.Info(ctx, fmt.Sprintf("Accrual Воркер поднялся, взято в работу %d заказов", orders), zap.Int("count", orders))
 	return nil
 }
 
@@ -97,7 +88,11 @@ func (p *AccrualProcessor) Enqueue(job model.OrderJob) {
 	if p.stopped.Load() {
 		return
 	}
-	p.jobs <- job
+	select {
+	case p.jobs <- job:
+	default:
+		p.EnqueueLater(job, 100*time.Millisecond)
+	}
 }
 
 // EnqueueLater - добавить заказ в очередь на обработку спустя некоторое время
@@ -329,4 +324,76 @@ func backoff(attempt int) time.Duration {
 		d = time.Minute
 	}
 	return d
+}
+
+func (p *AccrualProcessor) drainPending(ctx context.Context, limit uint64, useCursor bool) (int, error) {
+	var (
+		afterTime time.Time
+		afterUUID uuid.UUID
+		total     int
+	)
+	if useCursor {
+		afterTime, afterUUID = p.getPendingCursor()
+	}
+
+	for {
+		orders, err := p.repo.Orders().ListPendingAfter(ctx, limit, afterTime, afterUUID)
+		if err != nil {
+			return total, err
+		}
+		if len(orders) == 0 {
+			break
+		}
+
+		for _, order := range orders {
+			p.Enqueue(p.toOrderJob(order))
+		}
+
+		last := orders[len(orders)-1]
+		afterTime = last.UploadedAt
+		afterUUID = last.UUID
+		p.setPendingCursor(afterTime, afterUUID)
+		total += len(orders)
+	}
+
+	return total, nil
+}
+
+func (p *AccrualProcessor) pollPending(ctx context.Context, limit uint64, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			if _, err := p.drainPending(ctx, limit, true); err != nil {
+				p.logger.Error(ctx, "Ошибка при загрузке новых заказов", zap.Error(err))
+			}
+		}
+	}
+}
+
+func (p *AccrualProcessor) setPendingCursor(afterTime time.Time, afterUUID uuid.UUID) {
+	p.pendingCursorMu.Lock()
+	p.pendingCursorTime = afterTime
+	p.pendingCursorUUID = afterUUID
+	p.pendingCursorMu.Unlock()
+}
+
+func (p *AccrualProcessor) getPendingCursor() (time.Time, uuid.UUID) {
+	p.pendingCursorMu.Lock()
+	defer p.pendingCursorMu.Unlock()
+	return p.pendingCursorTime, p.pendingCursorUUID
+}
+
+func (p *AccrualProcessor) toOrderJob(order *model.Order) model.OrderJob {
+	return model.OrderJob{
+		UserID:      order.UserUUID,
+		OrderUUID:   order.UUID,
+		OrderNumber: order.OrderID,
+		OrderStatus: order.Status,
+		Attempts:    0,
+	}
 }

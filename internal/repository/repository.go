@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -22,6 +23,7 @@ type OrderRepository interface {
 	SetStatusByUUID(ctx context.Context, uuid uuid.UUID, status model.OrderStatus) error
 	SetAccrualByUUID(ctx context.Context, uuid uuid.UUID, accrual float64) error
 	ListPending(ctx context.Context, limit uint64) ([]*model.Order, error)
+	ListPendingAfter(ctx context.Context, limit uint64, afterUploadedAt time.Time, afterUUID uuid.UUID) ([]*model.Order, error)
 }
 
 type WithdrawalRepository interface {

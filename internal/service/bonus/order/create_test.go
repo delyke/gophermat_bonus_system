@@ -104,7 +104,6 @@ func (s *ServiceSuite) TestCreateOrderSuccess() {
 	s.orderRepository.On("Create", s.ctx, mock.Anything).Return(&model.Order{
 		UUID: orderUUID,
 	}, nil)
-	s.accrualWorker.On("Enqueue", mock.Anything).Return(nil)
 	cUUID, err := s.service.Create(s.ctx, []byte("20000006"))
 
 	s.Require().NoError(err)

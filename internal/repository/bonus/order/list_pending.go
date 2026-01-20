@@ -14,6 +14,15 @@ import (
 )
 
 func (repo *repository) ListPending(ctx context.Context, limit uint64) ([]*model.Order, error) {
+	return repo.ListPendingAfter(ctx, limit, time.Time{}, uuid.Nil)
+}
+
+func (repo *repository) ListPendingAfter(
+	ctx context.Context,
+	limit uint64,
+	afterUploadedAt time.Time,
+	afterUUID uuid.UUID,
+) ([]*model.Order, error) {
 	builderSelect := sq.Select(
 		"uuid",
 		"order_id",
@@ -28,7 +37,13 @@ func (repo *repository) ListPending(ctx context.Context, limit uint64) ([]*model
 			repoModel.OrderNew,
 			repoModel.OrderProcessing,
 		}}).
+		OrderBy("uploaded_at ASC", "uuid ASC").
 		Limit(limit)
+
+	if !afterUploadedAt.IsZero() || afterUUID != uuid.Nil {
+		builderSelect = builderSelect.Where(sq.Expr("(uploaded_at, uuid) > (?, ?)", afterUploadedAt, afterUUID))
+	}
+
 	query, args, err := builderSelect.ToSql()
 	if err != nil {
 		repo.logger.Error(ctx, "Ошибка при сборке sql запроса", zap.Error(err))
