@@ -1,0 +1,14 @@
+services:
+  accrual:
+    build:
+      context: ../../../
+      dockerfile: deploy/docker/accrual/Dockerfile
+    container_name: accrual-service
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+    networks:
+      - gophermat-bonus-net
+networks:
+  gophermat-bonus-net:
+    external: true

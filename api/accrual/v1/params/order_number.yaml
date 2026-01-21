@@ -1,0 +1,7 @@
+name: number
+in: path
+required: true
+description: Номер заказа, для которого запрашиваются данные о начислении бонусных баллов
+schema:
+  type: string
+  example: "2377225624"

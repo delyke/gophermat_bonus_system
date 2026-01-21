@@ -1,0 +1,74 @@
+package v1
+
+import (
+	"errors"
+
+	"github.com/delyke/gophermat_bonus_system/internal/model"
+	bonusV1 "github.com/delyke/gophermat_bonus_system/pkg/openapi/bonus/v1"
+)
+
+func (s *APISuite) TestBalanceWithdrawalUnauthorized() {
+	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
+	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
+	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrUnauthorized)
+
+	res, err := s.api.BalanceWithdrawal(s.ctx, req)
+
+	s.Require().NoError(err)
+	s.Require().IsType(&bonusV1.BalanceWithdrawalUnauthorized{}, res)
+}
+
+func (s *APISuite) TestBalanceWithdrawalNotEnoughBalance() {
+	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
+	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
+	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrNotEnoughBalance)
+
+	res, err := s.api.BalanceWithdrawal(s.ctx, req)
+
+	s.Require().NoError(err)
+	s.Require().IsType(&bonusV1.BalanceWithdrawalPaymentRequired{}, res)
+}
+
+func (s *APISuite) TestBalanceWithdrawalInvalidOrder() {
+	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
+	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
+	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrOrderIDLuhnInvalid)
+
+	res, err := s.api.BalanceWithdrawal(s.ctx, req)
+
+	s.Require().NoError(err)
+	s.Require().IsType(&bonusV1.BalanceWithdrawalUnprocessableEntity{}, res)
+}
+
+func (s *APISuite) TestBalanceWithdrawalBadCredentials() {
+	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
+	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
+	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(model.ErrBadCredentials)
+
+	res, err := s.api.BalanceWithdrawal(s.ctx, req)
+
+	s.Require().NoError(err)
+	s.Require().IsType(&bonusV1.BalanceWithdrawalUnprocessableEntity{}, res)
+}
+
+func (s *APISuite) TestBalanceWithdrawalInternalServerError() {
+	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
+	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
+	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(errors.New("unexpected error"))
+
+	res, err := s.api.BalanceWithdrawal(s.ctx, req)
+
+	s.Require().NoError(err)
+	s.Require().IsType(&bonusV1.BalanceWithdrawalInternalServerError{}, res)
+}
+
+func (s *APISuite) TestBalanceWithdrawalOK() {
+	req := &bonusV1.BalanceWithdrawalRequest{Order: "20000006", Sum: 10}
+	s.bonusService.On("Withdrawals").Return(s.withdrawalService)
+	s.withdrawalService.On("Create", s.ctx, []byte("20000006"), 10.0).Return(nil)
+
+	res, err := s.api.BalanceWithdrawal(s.ctx, req)
+
+	s.Require().NoError(err)
+	s.Require().IsType(&bonusV1.BalanceWithdrawalOK{}, res)
+}

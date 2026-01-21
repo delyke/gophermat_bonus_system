@@ -1,0 +1,64 @@
+package order
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/suite"
+
+	"github.com/delyke/gophermat_bonus_system/internal/logger"
+	"github.com/delyke/gophermat_bonus_system/internal/model"
+	"github.com/delyke/gophermat_bonus_system/internal/repository/mocks"
+	workerMocks "github.com/delyke/gophermat_bonus_system/internal/service/workers/mocks"
+)
+
+type ServiceSuite struct {
+	suite.Suite
+	ctx             context.Context //nolint:containedctx
+	bonusRepository *mocks.BonusRepository
+	accrualWorker   *workerMocks.AccrualWorker
+	service         *service
+	faker           *gofakeit.Faker
+	orderRepository *mocks.OrderRepository
+	logger          *logger.Logger
+}
+
+func (s *ServiceSuite) SetupTest() {
+	s.ctx = context.Background()
+	s.bonusRepository = mocks.NewBonusRepository(s.T())
+	s.accrualWorker = workerMocks.NewAccrualWorker(s.T())
+	s.orderRepository = mocks.NewOrderRepository(s.T())
+	s.logger = logger.NewNop()
+	s.service = NewService(s.bonusRepository, s.accrualWorker, s.logger)
+	s.faker = gofakeit.New(0)
+}
+
+func (s *ServiceSuite) TearDownTest() {}
+
+func TestServiceIntegration(t *testing.T) {
+	suite.Run(t, new(ServiceSuite))
+}
+
+func (s *ServiceSuite) CreateFakeOrder() *model.Order {
+	oUUID, err := uuid.Parse(s.faker.UUID())
+	if err != nil {
+		panic(err)
+	}
+
+	oUserUUID, err := uuid.Parse(s.faker.UUID())
+	if err != nil {
+		panic(err)
+	}
+
+	return &model.Order{
+		UUID:       oUUID,
+		OrderID:    s.faker.Phrase(),
+		Status:     model.OrderProcessing,
+		Accrual:    nil,
+		UserUUID:   oUserUUID,
+		UploadedAt: time.Time{},
+	}
+}

@@ -1,0 +1,24 @@
+get:
+  summary: Получение текущего баланса пользователя
+  operationId: GetUserBalance
+  tags:
+    - Business
+  security:
+    - JwtCookieAuth: [ ]
+  responses:
+    '200':
+      description: Успешная обработка запроса
+      content:
+        application/json:
+          schema:
+            $ref: ../components/balance_response.yaml
+    '401':
+      description: Пользователь не авторизован
+    '500':
+      description: Внутренняя ошибка сервера
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/generic_error.yaml

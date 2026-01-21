@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: Gophermat Bonus System API
+  version: 1.0.0
+  description: Накопительная система лояльности "Гофермат"
+x-ogen:
+  target: ./pkg/openapi/bonus/v1
+  package: bonus_v1
+  clean: true
+
+tags:
+  - name: Auth
+    description: Регистрация, аутентификация и авторизация пользователей
+  - name: Business
+    description: Прием номеров заказов, учет и ведение списка переданных номеров заказов зарегистрированного пользователя
+
+paths:
+  /api/user/register:
+    $ref: "./paths/register.yaml"
+  /api/user/login:
+    $ref: "./paths/login.yaml"
+  /api/user/orders:
+    $ref: "./paths/orders.yaml"
+  /api/user/balance:
+    $ref: "./paths/balance.yaml"
+  /api/user/balance/withdraw:
+    $ref: "./paths/balance_withdraw.yaml"
+  /api/user/withdrawals:
+    $ref: "./paths/withdrawals.yaml"
+
+components:
+  securitySchemes:
+    JwtCookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: JWT access token, передаётся в cookie `access_token` (HttpOnly)

@@ -1,0 +1,13 @@
+type: object
+required:
+  - login
+  - password
+properties:
+  login:
+    type: string
+    description: Логин пользователя
+    example: delyke
+  password:
+    type: string
+    description: Пароль пользователя
+    example: password123

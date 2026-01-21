@@ -1,0 +1,38 @@
+package config
+
+import "time"
+
+type LoggerConfig interface {
+	Level() string
+	AsJSON() bool
+}
+
+type PostgresConfig interface {
+	Host() string
+	Port() int
+	User() string
+	Password() string
+	Database() string
+	DatabaseURI() string
+	MigrationDirectory() string
+	URI() string
+}
+
+type BonusHTTPConfig interface {
+	RunAddress() string
+	ReadTimeout() time.Duration
+}
+
+type AccrualConfig interface {
+	SystemAddress() string
+	WorkersCount() int
+}
+
+type JWTConfig interface {
+	Secret() string
+	TTL() time.Duration
+}
+
+type AppConfig interface {
+	ShutdownTimeout() time.Duration
+}

@@ -1,0 +1,14 @@
+type: object
+required:
+  - order
+  - sum
+properties:
+  order:
+    type: string
+    format: digits only
+    description: Номер заказа
+    example: "2377225624"
+  sum:
+    type: number
+    format: float64
+    description: Сумма баллов к списанию в счет оплаты

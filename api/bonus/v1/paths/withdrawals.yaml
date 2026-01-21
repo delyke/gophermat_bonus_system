@@ -1,0 +1,26 @@
+get:
+  summary: Получение информации о выводе средств
+  operationId: GetWithdrawals
+  tags:
+    - Business
+  security:
+    - JwtCookieAuth: [ ]
+  responses:
+    '200':
+      description: Успешная обработка запроса
+      content:
+        application/json:
+          schema:
+            $ref: "../components/get_withdrawals_response.yaml"
+    '204':
+      description: Нет ни одного списания
+    '401':
+      description: Пользователь не авторизован
+    '500':
+      description: Внутренняя ошибка сервера
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/generic_error.yaml
